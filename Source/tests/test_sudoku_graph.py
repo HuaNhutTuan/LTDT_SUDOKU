@@ -177,6 +177,86 @@ class TestSudokuGraphCore(unittest.TestCase):
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
 
+    def test_game_validator_realtime_conflicts(self):
+        """Kiểm tra chức năng Game Validator: quét 20 đỉnh kề và phát hiện xung đột thời gian thực."""
+        # Bắt đầu với bảng trống
+        g = SudokuGraph()
+        g.assign_color(0, 5)  # Ô (0, 0) nhận màu 5
+        
+        # Ô (0, 8) cùng hàng nhận màu 5 -> xung đột hàng
+        g.colors[8] = 5
+        conflicts_0 = g.find_conflicts(0)
+        self.assertEqual(len(conflicts_0), 1)
+        self.assertEqual(conflicts_0[0]["type"], "row")
+        self.assertIn("HÀNG 1", conflicts_0[0]["message"])
+
+        # Ô (8, 0) cùng cột nhận màu 5 -> xung đột cột
+        g.colors[72] = 5
+        conflicts_0 = g.find_conflicts(0)
+        self.assertEqual(len(conflicts_0), 2)
+        types = {c["type"] for c in conflicts_0}
+        self.assertIn("row", types)
+        self.assertIn("col", types)
+
+        # Ô (1, 1) trong cùng khối 3x3 nhận màu 5 -> xung đột khối
+        g.colors[10] = 5
+        conflicts_0 = g.find_conflicts(0)
+        self.assertEqual(len(conflicts_0), 3)
+        types = {c["type"] for c in conflicts_0}
+        self.assertEqual(types, {"row", "col", "box"})
+
+    def test_hint_engine_naked_single_and_dsatur(self):
+        """Kiểm tra chức năng Hint Engine: phát hiện Naked Single (MRV = 1) và giải thích logic đồ thị."""
+        g = SudokuGraph()
+        # Đề mẫu
+        puzzle = (
+            "530070000"
+            "600195000"
+            "098000060"
+            "800060003"
+            "400803001"
+            "700020006"
+            "060000280"
+            "000419005"
+            "000080079"
+        )
+        g.load_from_string(puzzle)
+        hint = g.get_hint()
+        self.assertIsNotNone(hint)
+        self.assertIn("reason", hint)
+        self.assertIn("sat_degree", hint)
+        self.assertIn("suggested_color", hint)
+        self.assertTrue(1 <= hint["suggested_color"] <= 9)
+
+    def test_solvability_checker_and_solution_counting(self):
+        """Kiểm tra chức năng Solvability Checker: đếm số nghiệm chính xác 100%."""
+        g = SudokuGraph()
+        puzzle = (
+            "530070000"
+            "600195000"
+            "098000060"
+            "800060003"
+            "400803001"
+            "700020006"
+            "060000280"
+            "000419005"
+            "000080079"
+        )
+        g.load_from_string(puzzle)
+        
+        # Đề chuẩn phải có đúng 1 nghiệm duy nhất
+        res = g.check_solvability()
+        self.assertEqual(res["status"], "UNIQUE_SOLUTION")
+        self.assertEqual(res["solutions_count"], 1)
+
+        # Cố ý điền một số sai làm bế tắc bàn cờ
+        # Đỉnh 2 (hàng 0, cột 2) điền màu sai khiến ô khác không còn màu khả dụng
+        g.colors[2] = 1
+        g.colors[11] = 1  # Trùng cột 2 với hàng 1 -> xung đột
+        res_conflict = g.check_solvability()
+        self.assertEqual(res_conflict["status"], "UNSOLVABLE")
+        self.assertEqual(res_conflict["solutions_count"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

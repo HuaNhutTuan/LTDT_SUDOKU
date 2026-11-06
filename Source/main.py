@@ -83,6 +83,32 @@ def demonstrate_graph_core():
     except PrecoloringConflictError as err:
         print(f"  [ĐÃ BẮT LỖI THÀNH CÔNG] Ngoại lệ: {err}")
 
+    print("\n[BƯỚC 6] KIỂM TRA TÍNH KHẢ GIẢI VÀ SỐ NGHIỆM (SOLVABILITY CHECKER):")
+    solvability = graph.check_solvability()
+    print(f"  + Trạng thái: {solvability['status']}")
+    print(f"  + Số lượng nghiệm tìm được: {solvability['solutions_count']}")
+    print(f"  + Thông điệp: {solvability['message']}")
+
+    print("\n[BƯỚC 7] GỢI Ý NƯỚC ĐI TIẾP THEO (HINT ENGINE THEO HEURISTIC DSATUR & MRV):")
+    hint = graph.get_hint()
+    if hint:
+        print(f"  + Ô gợi ý: Hàng {hint['row'] + 1}, Cột {hint['col'] + 1} (Đỉnh {hint['vertex']})")
+        print(f"  + Bậc bão hòa sat_deg: {hint['sat_degree']}/9")
+        print(f"  + Màu gợi ý: {hint['suggested_color']}")
+        print(f"  + Miền màu khả dụng: {hint['available_colors']}")
+        print(f"  + Lời giải thích logic đồ thị: {hint['reason']}")
+
+    print("\n[BƯỚC 8] KIỂM TRA XUNG ĐỘT THỜI GIAN THỰC (GAME VALIDATOR):")
+    # Giả lập người chơi thử điền sai màu 5 vào ô (0, 2)
+    fake_v = SudokuGraph.coords_to_index(0, 2)
+    graph.colors[fake_v] = 5
+    conflicts = graph.find_conflicts(fake_v)
+    print(f"  + Người chơi nhập thử số 5 vào ô (1, 3)...")
+    print(f"  + Phát hiện {len(conflicts)} xung đột trên 20 đỉnh kề:")
+    for c in conflicts:
+        print(f"    - {c['message']}")
+    graph.colors[fake_v] = 0  # Hoàn tác
+
     print("\n" + "=" * 70)
     print("  KẾT LUẬN: Lõi đồ thị SudokuGraph hoạt động 100% chính xác!")
     print("  Đã sẵn sàng bàn giao API cho TV2 (Welsh-Powell, DSATUR),")

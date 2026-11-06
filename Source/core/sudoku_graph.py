@@ -141,6 +141,223 @@ class SudokuGraph(Graph):
                 return False
         return True
 
+    def find_conflicts(self, vertex: int) -> List[Dict]:
+        """
+        Quét nhanh 20 đỉnh kề của đỉnh `vertex` để tìm các xung đột màu thời gian thực.
+        Phục vụ Game Validator: Khi người chơi nhập một số, lập tức phát hiện ô trùng màu
+        và loại xung đột (Hàng, Cột, Khối 3x3) để giao diện hiển thị cảnh báo vi phạm.
+        """
+        c = self.colors[vertex]
+        if c == 0:
+            return []
+
+        r1, c1 = self.index_to_coords(vertex)
+        b1 = self.get_box_index(r1, c1)
+        conflicts = []
+
+        for nbr in self.adjacency_list[vertex]:
+            if self.colors[nbr] == c:
+                r2, c2 = self.index_to_coords(nbr)
+                b2 = self.get_box_index(r2, c2)
+                
+                conflict_type = "row" if r1 == r2 else ("col" if c1 == c2 else "box")
+                if conflict_type == "row":
+                    msg = f"Trùng màu {c} với ô ({r2 + 1}, {c2 + 1}) cùng HÀNG {r1 + 1}"
+                elif conflict_type == "col":
+                    msg = f"Trùng màu {c} với ô ({r2 + 1}, {c2 + 1}) cùng CỘT {c1 + 1}"
+                else:
+                    msg = f"Trùng màu {c} với ô ({r2 + 1}, {c2 + 1}) cùng KHỐI 3x3 số {b1 + 1}"
+
+                conflicts.append({
+                    "neighbor_vertex": nbr,
+                    "row": r2,
+                    "col": c2,
+                    "color": c,
+                    "type": conflict_type,
+                    "message": msg
+                })
+
+        return conflicts
+
+    def get_all_conflicts(self) -> List[Dict]:
+        """Quét toàn bộ bàn cờ tìm tất cả các cặp đỉnh kề đang bị xung đột màu."""
+        conflicts = []
+        for u in range(self.NUM_VERTICES):
+            c_u = self.colors[u]
+            if c_u == 0:
+                continue
+            r1, c1 = self.index_to_coords(u)
+            b1 = self.get_box_index(r1, c1)
+            for v in self.adjacency_list[u]:
+                if u < v and self.colors[v] == c_u:
+                    r2, c2 = self.index_to_coords(v)
+                    c_type = "row" if r1 == r2 else ("col" if c1 == c2 else "box")
+                    conflicts.append({
+                        "u": u, "u_coords": (r1, c1),
+                        "v": v, "v_coords": (r2, c2),
+                        "color": c_u,
+                        "type": c_type
+                    })
+        return conflicts
+
+    def get_hint(self) -> Optional[Dict]:
+        """
+        Chức năng Gợi ý nước đi tiếp theo (Hint Engine theo Heuristic DSATUR & MRV).
+        - Ưu tiên 1: Ô chỉ còn đúng 1 màu khả dụng duy nhất (Naked Single / MRV = 1).
+        - Ưu tiên 2: Ô có Bậc bão hòa cao nhất max(sat_deg) (chịu nhiều ràng buộc nhất).
+        Trả về thông tin gợi ý chi tiết kèm lời giải thích logic theo lý thuyết đồ thị.
+        """
+        uncolored = self.get_uncolored_vertices()
+        if not uncolored:
+            return None
+
+        # Thu thập thông tin miền màu và bậc bão hòa cho tất cả ô chưa tô
+        candidates = []
+        for v in uncolored:
+            avail = self.get_available_colors(v)
+            sat = self.get_saturation_degree(v)
+            r, c = self.index_to_coords(v)
+            candidates.append({
+                "vertex": v,
+                "row": r,
+                "col": c,
+                "sat_degree": sat,
+                "available_colors": sorted(list(avail)),
+                "num_available": len(avail)
+            })
+
+        # Trường hợp bế tắc: có ô trống nhưng không còn màu khả dụng nào
+        deadlocks = [c for c in candidates if c["num_available"] == 0]
+        if deadlocks:
+            d = deadlocks[0]
+            return {
+                "vertex": d["vertex"],
+                "row": d["row"],
+                "col": d["col"],
+                "sat_degree": d["sat_degree"],
+                "suggested_color": None,
+                "available_colors": [],
+                "reason": f"Bàn cờ bế tắc tại ô ({d['row'] + 1}, {d['col'] + 1}): Cả 9 màu đều đã bị 20 đỉnh kề chiếm giữ. Cần quay lui!"
+            }
+
+        # Ưu tiên 1: Ô Naked Single (MRV = 1)
+        naked_singles = [c for c in candidates if c["num_available"] == 1]
+        if naked_singles:
+            # Chọn ô Naked Single có bậc bão hòa cao nhất
+            best = max(naked_singles, key=lambda x: x["sat_degree"])
+            chosen_color = best["available_colors"][0]
+            return {
+                "vertex": best["vertex"],
+                "row": best["row"],
+                "col": best["col"],
+                "sat_degree": best["sat_degree"],
+                "suggested_color": chosen_color,
+                "available_colors": best["available_colors"],
+                "reason": (
+                    f"Ô ({best['row'] + 1}, {best['col'] + 1}) là 'Naked Single' (MRV = 1): "
+                    f"20 đỉnh kề đã chiếm giữ 8 màu khác nhau (Bậc bão hòa = {best['sat_degree']}). "
+                    f"Màu hợp lệ duy nhất còn lại là {chosen_color}."
+                )
+            }
+
+        # Ưu tiên 2: Ô có bậc bão hòa lớn nhất max(sat_deg), tiêu chí phụ: ít màu khả dụng nhất (min MRV)
+        best = max(candidates, key=lambda x: (x["sat_degree"], -x["num_available"]))
+        suggested_color = best["available_colors"][0]
+        return {
+            "vertex": best["vertex"],
+            "row": best["row"],
+            "col": best["col"],
+            "sat_degree": best["sat_degree"],
+            "suggested_color": suggested_color,
+            "available_colors": best["available_colors"],
+            "reason": (
+                f"Theo Heuristic DSATUR, ô ({best['row'] + 1}, {best['col'] + 1}) có Bậc bão hòa cao nhất "
+                f"({best['sat_degree']}/9 màu ở các đỉnh kề) và miền giá trị hẹp ({best['num_available']} màu: {best['available_colors']}). "
+                f"Nên ưu tiên thử gán màu {suggested_color}."
+            )
+        }
+
+    def count_solutions(self, max_solutions: int = 2) -> int:
+        """
+        Đếm số lượng lời giải hợp lệ của đồ thị Sudoku từ trạng thái hiện tại.
+        Áp dụng thuật toán Backtracking kết hợp Heuristic MRV (Minimum Remaining Values)
+        và cắt tỉa nhánh Forward Checking để đạt tốc độ tối đa.
+        Dừng lại ngay khi số nghiệm đạt `max_solutions` (mặc định = 2 để kiểm tra tính duy nhất).
+        """
+        # Nếu đang có xung đột tiền tô màu hoặc giữa các ô đã điền, chắc chắn 0 nghiệm
+        if self.get_all_conflicts():
+            return 0
+
+        # Làm việc trên bản sao trạng thái mảng colors để không ảnh hưởng dữ liệu gốc
+        working_colors = list(self.colors)
+        adj = self.adjacency_list
+        palette = self.PALETTE
+        solutions_count = 0
+
+        def solve() -> bool:
+            nonlocal solutions_count
+            if solutions_count >= max_solutions:
+                return True
+
+            # Tìm ô chưa tô có ít màu khả dụng nhất (MRV)
+            best_v = -1
+            best_avail: Optional[Set[int]] = None
+            min_count = 10
+
+            for v in range(self.NUM_VERTICES):
+                if working_colors[v] == 0:
+                    used = {working_colors[nbr] for nbr in adj[v] if working_colors[nbr] != 0}
+                    avail = palette - used
+                    cnt = len(avail)
+                    if cnt == 0:
+                        return False  # Bế tắc, nhánh này vô nghiệm
+                    if cnt < min_count:
+                        min_count = cnt
+                        best_v = v
+                        best_avail = avail
+                        if cnt == 1:
+                            break  # Tối ưu: Nếu gặp ô chỉ còn 1 màu thì chọn ngay
+
+            if best_v == -1:
+                # Đã tô kín toàn bộ 81 đỉnh hợp lệ
+                solutions_count += 1
+                return solutions_count >= max_solutions
+
+            for color in best_avail:
+                working_colors[best_v] = color
+                if solve():
+                    return True
+                working_colors[best_v] = 0
+
+            return False
+
+        solve()
+        return solutions_count
+
+    def check_solvability(self) -> Dict:
+        """
+        Chức năng Kiểm tra khả giải và số nghiệm (Solvability Checker):
+        - 0 nghiệm: Bàn cờ bế tắc (người chơi đã đi sai nước trước đó).
+        - 1 nghiệm: Bàn cờ hợp lệ, tồn tại đường giải duy nhất dẫn đến chiến thắng.
+        - > 1 nghiệm: Bàn cờ có nhiều hơn một cách giải (không chuẩn đề Sudoku).
+        """
+        count = self.count_solutions(max_solutions=2)
+        if count == 0:
+            status = "UNSOLVABLE"
+            msg = "Bàn cờ không có lời giải hợp lệ (bế tắc). Vui lòng kiểm tra lại các nước đã đi."
+        elif count == 1:
+            status = "UNIQUE_SOLUTION"
+            msg = "Bàn cờ hợp lệ và có đúng 1 lời giải duy nhất!"
+        else:
+            status = "MULTIPLE_SOLUTIONS"
+            msg = "Bàn cờ có nhiều hơn một lời giải hợp lệ."
+
+        return {
+            "status": status,
+            "solutions_count": count,
+            "message": msg
+        }
+
     def assign_color(self, vertex: int, color: int, as_precolored: bool = False) -> bool:
         """
         Gán màu cho một đỉnh. Trả về True nếu gán thành công, False nếu màu xung đột.

@@ -49,7 +49,7 @@ LTDT_SUDOKU/
 
 | STT | Thành viên & Vai trò | Module Code phụ trách | Báo cáo Tiểu luận | Trạng thái |
 |:---:|:---|:---|:---|:---:|
-| **1** | **Hứa Nhựt Tuấn** *(Nhóm trưởng)* | Lớp `SudokuGraph`, `IOHandler`, validate tiền tô màu, quản lý GitHub | Mở đầu, toàn bộ Chương 2, chuẩn hóa file Word | **Hoàn thành 100%** |
+| **1** | **Hứa Nhựt Tuấn** *(Nhóm trưởng)* | Lớp `SudokuGraph`, `IOHandler`, Game Validator, Solvability Checker, Hint Engine, quản lý GitHub | Mở đầu, toàn bộ Chương 2, chuẩn hóa file Word theo quy chuẩn HCMUE | **Hoàn thành 100%** |
 | **2** | **Thành viên 2** *(Tham lam & DSATUR)* | Hàm `WelshPowell()` & `DSATUR()`, cập nhật bậc bão hòa | Chương 1 (Mục 1.1, 1.2, 1.3.1, 1.3.2) | Đang thực hiện |
 | **3** | **Thành viên 3** *(Backtrack & Generator)* | Hàm `BacktrackDSATUR()`, sinh đề `GeneratePuzzle()` 4 cấp độ | Chương 1 (Mục 1.3.3), Chương 3 (Mục 3.2, 3.3) | Đang thực hiện |
 | **4** | **Thành viên 4** *(Giao diện GUI)* | Bàn cờ 9x9, highlight 20 đỉnh kề, step-by-step | Chương 3 (Mục 3.1, 3.4), Hướng dẫn sử dụng | Đang thực hiện |
@@ -91,6 +91,20 @@ graph.unassign_color(vertex=2)
 # 8. Kiểm tra hoàn thành lời giải hợp lệ
 if graph.is_complete():
     print("Sudoku đã giải thành công!")
+
+# 9. Kiểm tra xung đột thời gian thực trên 20 đỉnh kề (Game Validator cho TV4)
+conflicts = graph.find_conflicts(vertex=0)
+for c in conflicts:
+    print(c["message"])  # Cảnh báo xung đột cùng hàng, cùng cột hoặc cùng khối 3x3
+
+# 10. Gợi ý nước đi tiếp theo (Hint Engine theo DSATUR & Naked Single)
+hint = graph.get_hint()
+if hint:
+    print(f"Gợi ý ô ({hint['row']+1}, {hint['col']+1}) tô màu {hint['suggested_color']}: {hint['reason']}")
+
+# 11. Kiểm tra khả giải và đếm số nghiệm (Solvability Checker)
+sol_info = graph.check_solvability()
+print(f"Trạng thái: {sol_info['status']} ({sol_info['solutions_count']} nghiệm)")
 ```
 
 ---
