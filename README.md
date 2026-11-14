@@ -51,7 +51,7 @@ LTDT_SUDOKU/
 |:---:|:---|:---|:---|:---:|
 | **1** | **Hứa Nhựt Tuấn** *(Nhóm trưởng)* | Lớp `SudokuGraph`, `IOHandler`, Game Validator, Solvability Checker, Hint Engine, quản lý GitHub | Mở đầu, toàn bộ Chương 2, chuẩn hóa file Word theo quy chuẩn HCMUE | **Hoàn thành 100%** |
 | **2** | **Thành viên 2** *(Tham lam & DSATUR)* | Hàm `WelshPowell()` & `DSATUR()`, cập nhật bậc bão hòa | Chương 1 (Mục 1.1, 1.2, 1.3.1, 1.3.2) | Đang thực hiện |
-| **3** | **Thành viên 3** *(Backtrack & Generator)* | Hàm `BacktrackDSATUR()`, sinh đề `GeneratePuzzle()` 4 cấp độ | Chương 1 (Mục 1.3.3), Chương 3 (Mục 3.2, 3.3) | Đang thực hiện |
+| **3** | **Kiều Gia Bảo** *(Backtrack & Generator)* | Hàm `BacktrackDSATUR()`, sinh đề `GeneratePuzzle()` 4 cấp độ | Chương 1 (Mục 1.3.3), Chương 3 (Mục 3.2, 3.3) | Đang thực hiện |
 | **4** | **Thành viên 4** *(Giao diện GUI)* | Bàn cờ 9x9, highlight 20 đỉnh kề, step-by-step | Chương 3 (Mục 3.1, 3.4), Hướng dẫn sử dụng | Đang thực hiện |
 | **5** | **Thành viên 5** *(Benchmark & Media)* | Bộ 40-100 đề test, đo thời gian/bước duyệt, đóng gói Release | Chương 4 (Thực nghiệm & Đánh giá), Slide, Video | Đang thực hiện |
 
