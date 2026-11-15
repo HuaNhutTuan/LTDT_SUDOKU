@@ -9,9 +9,15 @@ Chỉ tiêu nghiệm thu:
 5. Đọc/ghi file đề bài chính xác.
 """
 
+import sys
 import unittest
 import os
 import tempfile
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 from Source.core.graph import Graph
 from Source.core.sudoku_graph import SudokuGraph, PrecoloringConflictError
 from Source.core.io_handler import IOHandler

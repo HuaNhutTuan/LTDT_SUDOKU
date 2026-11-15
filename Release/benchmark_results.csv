@@ -1,0 +1,121 @@
+puzzle_id,difficulty,clues_count,algorithm,execution_time_ms,vertices_visited,color_assignments,backtracks,is_solved,is_valid,chromatic_number,error_message
+EASY_01,Easy,36,Welsh-Powell,0.15,23,22,0,False,False,0,Deadlock tại đỉnh 46: không còn màu hợp lệ trong tập {1..9}.
+EASY_01,Easy,36,DSATUR Pure,2.302,45,45,0,True,True,9,
+EASY_01,Easy,36,Backtrack + DSATUR,0.441,46,45,0,True,True,9,
+EASY_02,Easy,36,Welsh-Powell,0.091,11,10,0,False,False,0,Deadlock tại đỉnh 13: không còn màu hợp lệ trong tập {1..9}.
+EASY_02,Easy,36,DSATUR Pure,2.225,45,45,0,True,True,9,
+EASY_02,Easy,36,Backtrack + DSATUR,0.422,46,45,0,True,True,9,
+EASY_03,Easy,36,Welsh-Powell,0.082,9,8,0,False,False,0,Deadlock tại đỉnh 75: không còn màu hợp lệ trong tập {1..9}.
+EASY_03,Easy,36,DSATUR Pure,2.679,45,45,0,True,True,9,
+EASY_03,Easy,36,Backtrack + DSATUR,0.652,46,45,0,True,True,9,
+EASY_04,Easy,36,Welsh-Powell,0.07,3,2,0,False,False,0,Deadlock tại đỉnh 4: không còn màu hợp lệ trong tập {1..9}.
+EASY_04,Easy,36,DSATUR Pure,2.34,45,45,0,True,True,9,
+EASY_04,Easy,36,Backtrack + DSATUR,0.275,46,45,0,True,True,9,
+EASY_05,Easy,36,Welsh-Powell,0.073,5,4,0,False,False,0,Deadlock tại đỉnh 41: không còn màu hợp lệ trong tập {1..9}.
+EASY_05,Easy,36,DSATUR Pure,2.944,45,45,0,True,True,9,
+EASY_05,Easy,36,Backtrack + DSATUR,1.006,46,45,0,True,True,9,
+EASY_06,Easy,36,Welsh-Powell,0.129,9,8,0,False,False,0,Deadlock tại đỉnh 30: không còn màu hợp lệ trong tập {1..9}.
+EASY_06,Easy,36,DSATUR Pure,2.706,45,45,0,True,True,9,
+EASY_06,Easy,36,Backtrack + DSATUR,0.579,46,45,0,True,True,9,
+EASY_07,Easy,36,Welsh-Powell,0.088,10,9,0,False,False,0,Deadlock tại đỉnh 32: không còn màu hợp lệ trong tập {1..9}.
+EASY_07,Easy,36,DSATUR Pure,2.437,45,45,0,True,True,9,
+EASY_07,Easy,36,Backtrack + DSATUR,0.4,46,45,0,True,True,9,
+EASY_08,Easy,36,Welsh-Powell,0.106,8,7,0,False,False,0,Deadlock tại đỉnh 1: không còn màu hợp lệ trong tập {1..9}.
+EASY_08,Easy,36,DSATUR Pure,2.442,45,45,0,True,True,9,
+EASY_08,Easy,36,Backtrack + DSATUR,0.262,46,45,0,True,True,9,
+EASY_09,Easy,36,Welsh-Powell,0.085,4,3,0,False,False,0,Deadlock tại đỉnh 11: không còn màu hợp lệ trong tập {1..9}.
+EASY_09,Easy,36,DSATUR Pure,2.767,45,45,0,True,True,9,
+EASY_09,Easy,36,Backtrack + DSATUR,0.196,46,45,0,True,True,9,
+EASY_10,Easy,36,Welsh-Powell,0.077,5,4,0,False,False,0,Deadlock tại đỉnh 57: không còn màu hợp lệ trong tập {1..9}.
+EASY_10,Easy,36,DSATUR Pure,2.309,45,45,0,True,True,9,
+EASY_10,Easy,36,Backtrack + DSATUR,1.197,46,45,0,True,True,9,
+MEDIUM_01,Medium,32,Welsh-Powell,0.112,16,15,0,False,False,0,Deadlock tại đỉnh 37: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_01,Medium,32,DSATUR Pure,3.283,49,49,0,True,True,9,
+MEDIUM_01,Medium,32,Backtrack + DSATUR,1.208,91,90,41,True,True,9,
+MEDIUM_02,Medium,32,Welsh-Powell,0.08,6,5,0,False,False,0,Deadlock tại đỉnh 34: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_02,Medium,32,DSATUR Pure,2.936,49,49,0,True,True,9,
+MEDIUM_02,Medium,32,Backtrack + DSATUR,0.52,50,49,0,True,True,9,
+MEDIUM_03,Medium,32,Welsh-Powell,0.078,6,5,0,False,False,0,Deadlock tại đỉnh 15: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_03,Medium,32,DSATUR Pure,2.209,29,28,0,False,False,0,Deadlock tại đỉnh 39 (bậc bão hòa 9): 0 màu khả dụng.
+MEDIUM_03,Medium,32,Backtrack + DSATUR,0.609,50,49,0,True,True,9,
+MEDIUM_04,Medium,32,Welsh-Powell,0.113,22,21,0,False,False,0,Deadlock tại đỉnh 22: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_04,Medium,32,DSATUR Pure,3.405,49,49,0,True,True,9,
+MEDIUM_04,Medium,32,Backtrack + DSATUR,1.035,115,114,65,True,True,9,
+MEDIUM_05,Medium,32,Welsh-Powell,0.11,19,18,0,False,False,0,Deadlock tại đỉnh 53: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_05,Medium,32,DSATUR Pure,2.942,49,49,0,True,True,9,
+MEDIUM_05,Medium,32,Backtrack + DSATUR,0.596,50,49,0,True,True,9,
+MEDIUM_06,Medium,32,Welsh-Powell,0.108,10,9,0,False,False,0,Deadlock tại đỉnh 45: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_06,Medium,32,DSATUR Pure,2.017,25,24,0,False,False,0,Deadlock tại đỉnh 51 (bậc bão hòa 9): 0 màu khả dụng.
+MEDIUM_06,Medium,32,Backtrack + DSATUR,0.995,52,51,2,True,True,9,
+MEDIUM_07,Medium,32,Welsh-Powell,0.086,10,9,0,False,False,0,Deadlock tại đỉnh 49: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_07,Medium,32,DSATUR Pure,2.881,49,49,0,True,True,9,
+MEDIUM_07,Medium,32,Backtrack + DSATUR,0.72,50,49,0,True,True,9,
+MEDIUM_08,Medium,32,Welsh-Powell,0.128,8,7,0,False,False,0,Deadlock tại đỉnh 60: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_08,Medium,32,DSATUR Pure,2.198,31,30,0,False,False,0,Deadlock tại đỉnh 45 (bậc bão hòa 9): 0 màu khả dụng.
+MEDIUM_08,Medium,32,Backtrack + DSATUR,0.992,52,51,2,True,True,9,
+MEDIUM_09,Medium,32,Welsh-Powell,0.085,10,9,0,False,False,0,Deadlock tại đỉnh 32: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_09,Medium,32,DSATUR Pure,1.971,21,20,0,False,False,0,Deadlock tại đỉnh 47 (bậc bão hòa 9): 0 màu khả dụng.
+MEDIUM_09,Medium,32,Backtrack + DSATUR,1.005,60,59,10,True,True,9,
+MEDIUM_10,Medium,32,Welsh-Powell,0.12,27,26,0,False,False,0,Deadlock tại đỉnh 23: không còn màu hợp lệ trong tập {1..9}.
+MEDIUM_10,Medium,32,DSATUR Pure,1.632,15,14,0,False,False,0,Deadlock tại đỉnh 52 (bậc bão hòa 9): 0 màu khả dụng.
+MEDIUM_10,Medium,32,Backtrack + DSATUR,1.509,63,62,13,True,True,9,
+HARD_01,Hard,26,Welsh-Powell,0.094,13,12,0,False,False,0,Deadlock tại đỉnh 8: không còn màu hợp lệ trong tập {1..9}.
+HARD_01,Hard,26,DSATUR Pure,1.359,15,14,0,False,False,0,Deadlock tại đỉnh 72 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_01,Hard,26,Backtrack + DSATUR,4.506,326,325,270,True,True,9,
+HARD_02,Hard,26,Welsh-Powell,0.089,7,6,0,False,False,0,Deadlock tại đỉnh 14: không còn màu hợp lệ trong tập {1..9}.
+HARD_02,Hard,26,DSATUR Pure,1.96,24,23,0,False,False,0,Deadlock tại đỉnh 77 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_02,Hard,26,Backtrack + DSATUR,14.805,917,916,861,True,True,9,
+HARD_03,Hard,26,Welsh-Powell,0.12,27,26,0,False,False,0,Deadlock tại đỉnh 65: không còn màu hợp lệ trong tập {1..9}.
+HARD_03,Hard,26,DSATUR Pure,2.12,22,21,0,False,False,0,Deadlock tại đỉnh 57 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_03,Hard,26,Backtrack + DSATUR,1.499,107,106,51,True,True,9,
+HARD_04,Hard,26,Welsh-Powell,0.122,6,5,0,False,False,0,Deadlock tại đỉnh 31: không còn màu hợp lệ trong tập {1..9}.
+HARD_04,Hard,26,DSATUR Pure,1.629,15,14,0,False,False,0,Deadlock tại đỉnh 63 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_04,Hard,26,Backtrack + DSATUR,1.785,125,124,69,True,True,9,
+HARD_05,Hard,26,Welsh-Powell,0.118,25,24,0,False,False,0,Deadlock tại đỉnh 58: không còn màu hợp lệ trong tập {1..9}.
+HARD_05,Hard,26,DSATUR Pure,2.194,22,21,0,False,False,0,Deadlock tại đỉnh 54 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_05,Hard,26,Backtrack + DSATUR,1.279,56,55,0,True,True,9,
+HARD_06,Hard,26,Welsh-Powell,0.071,3,2,0,False,False,0,Deadlock tại đỉnh 15: không còn màu hợp lệ trong tập {1..9}.
+HARD_06,Hard,26,DSATUR Pure,2.742,30,29,0,False,False,0,Deadlock tại đỉnh 29 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_06,Hard,26,Backtrack + DSATUR,0.682,58,57,2,True,True,9,
+HARD_07,Hard,26,Welsh-Powell,0.085,9,8,0,False,False,0,Deadlock tại đỉnh 25: không còn màu hợp lệ trong tập {1..9}.
+HARD_07,Hard,26,DSATUR Pure,0.589,4,3,0,False,False,0,Deadlock tại đỉnh 58 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_07,Hard,26,Backtrack + DSATUR,4.526,202,201,146,True,True,9,
+HARD_08,Hard,26,Welsh-Powell,0.108,19,18,0,False,False,0,Deadlock tại đỉnh 7: không còn màu hợp lệ trong tập {1..9}.
+HARD_08,Hard,26,DSATUR Pure,1.22,9,8,0,False,False,0,Deadlock tại đỉnh 67 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_08,Hard,26,Backtrack + DSATUR,2.467,180,179,124,True,True,9,
+HARD_09,Hard,26,Welsh-Powell,0.095,13,12,0,False,False,0,Deadlock tại đỉnh 42: không còn màu hợp lệ trong tập {1..9}.
+HARD_09,Hard,26,DSATUR Pure,2.129,22,21,0,False,False,0,Deadlock tại đỉnh 75 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_09,Hard,26,Backtrack + DSATUR,1.935,143,142,87,True,True,9,
+HARD_10,Hard,26,Welsh-Powell,0.097,16,15,0,False,False,0,Deadlock tại đỉnh 21: không còn màu hợp lệ trong tập {1..9}.
+HARD_10,Hard,26,DSATUR Pure,2.655,29,28,0,False,False,0,Deadlock tại đỉnh 7 (bậc bão hòa 9): 0 màu khả dụng.
+HARD_10,Hard,26,Backtrack + DSATUR,17.593,1076,1075,1020,True,True,9,
+EXPERT_01,Expert,17,Welsh-Powell,0.164,26,25,0,False,False,0,Deadlock tại đỉnh 53: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_01,Expert,17,DSATUR Pure,1.801,17,16,0,False,False,0,Deadlock tại đỉnh 27 (bậc bão hòa 9): 0 màu khả dụng.
+EXPERT_01,Expert,17,Backtrack + DSATUR,123.375,6037,6036,5972,True,True,9,
+EXPERT_02,Expert,17,Welsh-Powell,0.178,27,26,0,False,False,0,Deadlock tại đỉnh 73: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_02,Expert,17,DSATUR Pure,2.338,26,25,0,False,False,0,Deadlock tại đỉnh 75 (bậc bão hòa 9): 0 màu khả dụng.
+EXPERT_02,Expert,17,Backtrack + DSATUR,13.367,719,718,654,True,True,9,
+EXPERT_03,Expert,21,Welsh-Powell,0.12,28,27,0,False,False,0,Deadlock tại đỉnh 1: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_03,Expert,21,DSATUR Pure,2.264,27,26,0,False,False,0,Deadlock tại đỉnh 23 (bậc bão hòa 9): 0 màu khả dụng.
+EXPERT_03,Expert,21,Backtrack + DSATUR,213.613,13811,13810,13750,True,True,9,
+EXPERT_04,Expert,21,Welsh-Powell,0.106,21,20,0,False,False,0,Deadlock tại đỉnh 61: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_04,Expert,21,DSATUR Pure,2.164,22,21,0,False,False,0,Deadlock tại đỉnh 35 (bậc bão hòa 9): 0 màu khả dụng.
+EXPERT_04,Expert,21,Backtrack + DSATUR,73.169,6274,6273,6213,True,True,9,
+EXPERT_05,Expert,21,Welsh-Powell,0.127,34,33,0,False,False,0,Deadlock tại đỉnh 22: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_05,Expert,21,DSATUR Pure,0.864,5,4,0,False,False,0,Deadlock tại đỉnh 64 (bậc bão hòa 9): 0 màu khả dụng.
+EXPERT_05,Expert,21,Backtrack + DSATUR,36.209,2886,2885,2825,True,True,9,
+EXPERT_06,Expert,23,Welsh-Powell,0.093,16,15,0,False,False,0,Deadlock tại đỉnh 4: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_06,Expert,23,DSATUR Pure,4.527,39,38,0,False,False,0,Deadlock tại đỉnh 68 (bậc bão hòa 9): 0 màu khả dụng.
+EXPERT_06,Expert,23,Backtrack + DSATUR,2.665,220,219,161,True,True,9,
+EXPERT_07,Expert,24,Welsh-Powell,0.087,12,11,0,False,False,0,Deadlock tại đỉnh 69: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_07,Expert,24,DSATUR Pure,0.985,8,7,0,False,False,0,Deadlock tại đỉnh 60 (bậc bão hòa 9): 0 màu khả dụng.
+EXPERT_07,Expert,24,Backtrack + DSATUR,4.438,190,189,132,True,True,9,
+EXPERT_08,Expert,24,Welsh-Powell,0.122,9,8,0,False,False,0,Deadlock tại đỉnh 42: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_08,Expert,24,DSATUR Pure,2.291,16,15,0,False,False,0,Deadlock tại đỉnh 45 (bậc bão hòa 9): 0 màu khả dụng.
+EXPERT_08,Expert,24,Backtrack + DSATUR,13.811,855,854,797,True,True,9,
+EXPERT_09,Expert,24,Welsh-Powell,0.106,4,3,0,False,False,0,Deadlock tại đỉnh 34: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_09,Expert,24,DSATUR Pure,3.165,35,34,0,False,False,0,Deadlock tại đỉnh 78 (bậc bão hòa 9): 0 màu khả dụng.
+EXPERT_09,Expert,24,Backtrack + DSATUR,1.012,109,108,51,True,True,9,
+EXPERT_10,Expert,25,Welsh-Powell,0.097,15,14,0,False,False,0,Deadlock tại đỉnh 76: không còn màu hợp lệ trong tập {1..9}.
+EXPERT_10,Expert,25,DSATUR Pure,5.307,56,56,0,True,True,9,
+EXPERT_10,Expert,25,Backtrack + DSATUR,0.538,67,66,10,True,True,9,

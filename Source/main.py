@@ -7,6 +7,12 @@ Môn học: Lý thuyết đồ thị và Ứng dụng - Khoa CNTT, HCMUE.
 import sys
 import os
 
+# Cấu hình encoding UTF-8 cho console để chạy hoàn hảo trên VS Code và Windows Terminal
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 # Thêm đường dẫn gốc để import module
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

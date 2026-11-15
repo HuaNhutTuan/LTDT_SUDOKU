@@ -1,0 +1,140 @@
+{
+  "Welsh-Powell": {
+    "Easy": {
+      "total_puzzles": 10,
+      "solved_count": 0,
+      "success_rate_percent": 0.0,
+      "time_mean_ms": 0.095,
+      "time_min_ms": 0.07,
+      "time_max_ms": 0.15,
+      "assignments_mean": 7.7,
+      "backtracks_mean": 0.0,
+      "visited_mean": 8.7
+    },
+    "Medium": {
+      "total_puzzles": 10,
+      "solved_count": 0,
+      "success_rate_percent": 0.0,
+      "time_mean_ms": 0.102,
+      "time_min_ms": 0.078,
+      "time_max_ms": 0.128,
+      "assignments_mean": 12.4,
+      "backtracks_mean": 0.0,
+      "visited_mean": 13.4
+    },
+    "Hard": {
+      "total_puzzles": 10,
+      "solved_count": 0,
+      "success_rate_percent": 0.0,
+      "time_mean_ms": 0.1,
+      "time_min_ms": 0.071,
+      "time_max_ms": 0.122,
+      "assignments_mean": 12.8,
+      "backtracks_mean": 0.0,
+      "visited_mean": 13.8
+    },
+    "Expert": {
+      "total_puzzles": 10,
+      "solved_count": 0,
+      "success_rate_percent": 0.0,
+      "time_mean_ms": 0.12,
+      "time_min_ms": 0.087,
+      "time_max_ms": 0.178,
+      "assignments_mean": 18.2,
+      "backtracks_mean": 0.0,
+      "visited_mean": 19.2
+    }
+  },
+  "DSATUR Pure": {
+    "Easy": {
+      "total_puzzles": 10,
+      "solved_count": 10,
+      "success_rate_percent": 100.0,
+      "time_mean_ms": 2.515,
+      "time_min_ms": 2.225,
+      "time_max_ms": 2.944,
+      "assignments_mean": 45.0,
+      "backtracks_mean": 0.0,
+      "visited_mean": 45.0
+    },
+    "Medium": {
+      "total_puzzles": 10,
+      "solved_count": 5,
+      "success_rate_percent": 50.0,
+      "time_mean_ms": 2.547,
+      "time_min_ms": 1.632,
+      "time_max_ms": 3.405,
+      "assignments_mean": 36.1,
+      "backtracks_mean": 0.0,
+      "visited_mean": 36.6
+    },
+    "Hard": {
+      "total_puzzles": 10,
+      "solved_count": 0,
+      "success_rate_percent": 0.0,
+      "time_mean_ms": 1.86,
+      "time_min_ms": 0.589,
+      "time_max_ms": 2.742,
+      "assignments_mean": 18.2,
+      "backtracks_mean": 0.0,
+      "visited_mean": 19.2
+    },
+    "Expert": {
+      "total_puzzles": 10,
+      "solved_count": 1,
+      "success_rate_percent": 10.0,
+      "time_mean_ms": 2.571,
+      "time_min_ms": 0.864,
+      "time_max_ms": 5.307,
+      "assignments_mean": 24.2,
+      "backtracks_mean": 0.0,
+      "visited_mean": 25.1
+    }
+  },
+  "Backtrack + DSATUR": {
+    "Easy": {
+      "total_puzzles": 10,
+      "solved_count": 10,
+      "success_rate_percent": 100.0,
+      "time_mean_ms": 0.543,
+      "time_min_ms": 0.196,
+      "time_max_ms": 1.197,
+      "assignments_mean": 45.0,
+      "backtracks_mean": 0.0,
+      "visited_mean": 46.0
+    },
+    "Medium": {
+      "total_puzzles": 10,
+      "solved_count": 10,
+      "success_rate_percent": 100.0,
+      "time_mean_ms": 0.919,
+      "time_min_ms": 0.52,
+      "time_max_ms": 1.509,
+      "assignments_mean": 62.3,
+      "backtracks_mean": 13.3,
+      "visited_mean": 63.3
+    },
+    "Hard": {
+      "total_puzzles": 10,
+      "solved_count": 10,
+      "success_rate_percent": 100.0,
+      "time_mean_ms": 5.108,
+      "time_min_ms": 0.682,
+      "time_max_ms": 17.593,
+      "assignments_mean": 318.0,
+      "backtracks_mean": 263.0,
+      "visited_mean": 319.0
+    },
+    "Expert": {
+      "total_puzzles": 10,
+      "solved_count": 10,
+      "success_rate_percent": 100.0,
+      "time_mean_ms": 48.22,
+      "time_min_ms": 0.538,
+      "time_max_ms": 213.613,
+      "assignments_mean": 3115.8,
+      "backtracks_mean": 3056.5,
+      "visited_mean": 3116.8
+    }
+  }
+}
