@@ -96,11 +96,11 @@ def create_report():
     r_info = p_info.add_run(
         "Giảng viên hướng dẫn:  Bộ môn Khoa học Máy tính\n"
         "Nhóm thực hiện:        Nhóm Đồ án Sudoku (5 thành viên)\n"
-        "Nhóm trưởng:           Hứa Nhựt Tuấn   - MSSV: 51.01.104.114\n"
-        "Thành viên 2:          Thành viên 2    - Thuật toán Welsh-Powell & DSATUR\n"
-        "Kiều Gia Bảo:          Kiều Gia Bảo    - Backtracking + Heuristic & Sinh đề\n"
-        "Thành viên 4:          Thành viên 4    - Giao diện trực quan hóa GUI\n"
-        "Thành viên 5:          Thành viên 5    - Thực nghiệm, Benchmark & Media\n\n\n\n"
+        "Nhóm trưởng:           Hứa Nhựt Tuấn     - MSSV: 51.01.104.114\n"
+        "Thành viên 2:          Lê Văn Gia Bảo    - Thuật toán Welsh-Powell & DSATUR\n"
+        "Thành viên 3:          Kiều Gia Bảo      - Backtracking + Heuristic & Sinh đề\n"
+        "Thành viên 4:          Trần Phú Vinh     - Giao diện trực quan hóa GUI\n"
+        "Thành viên 5:          Nguyễn Đăng Khoa  - Thực nghiệm, Benchmark & Media\n\n\n\n"
     )
     r_info.font.size = Pt(13)
 
@@ -202,31 +202,31 @@ def create_report():
         ),
         (
             "2",
-            "Thành viên 2",
+            "Lê Văn Gia Bảo",
             "Cài đặt thuật toán Welsh-Powell và DSATUR thuần túy; module tính toán và cập nhật bậc bão hòa.",
             "Chương 1 (Mục 1.1, 1.2, 1.3.1, 1.3.2): Cơ sở lý thuyết đồ thị, mã giả và sơ đồ khối Welsh-Powell, DSATUR.",
-            "Đang thực hiện"
+            "100% (Tuần 1)"
         ),
         (
             "3",
             "Kiều Gia Bảo",
             "Cài đặt thuật toán BacktrackDSATUR kết hợp Forward Checking; xây dựng module GeneratePuzzle sinh đề 4 cấp độ.",
             "Chương 1 (Mục 1.3.3) và Chương 3 (Mục 3.2, 3.3): Cấu trúc dữ liệu, lưu đồ giải và sinh đề.",
-            "Đang thực hiện"
+            "100% (Tuần 1)"
         ),
         (
             "4",
-            "Thành viên 4",
+            "Trần Phú Vinh",
             "Xây dựng giao diện bàn cờ 9x9, chế độ trực quan hóa từng bước (Step-by-step), highlight 20 đỉnh kề.",
             "Chương 3 (Mục 3.1, 3.4): Kiến trúc hệ thống, giao diện GUI; biên soạn tài liệu Hướng dẫn sử dụng.",
-            "Đang thực hiện"
+            "100% (Tuần 1)"
         ),
         (
             "5",
-            "Thành viên 5",
+            "Nguyễn Đăng Khoa",
             "Xây dựng bộ 40-100 đề Benchmark, module đo thời gian (ms), đếm bước duyệt/quay lui; đóng gói Release.",
             "Chương 4 (Thực nghiệm & Đánh giá), Kết luận & Hướng phát triển; thiết kế Slide thuyết trình, dựng Video demo.",
-            "Đang thực hiện"
+            "100% (Tuần 1)"
         )
     ]
 

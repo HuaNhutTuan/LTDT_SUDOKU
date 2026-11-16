@@ -16,10 +16,10 @@
 **Giảng viên hướng dẫn:** Bộ môn Khoa học Máy tính  
 **Nhóm sinh viên thực hiện:** Nhóm Đồ án Sudoku (5 thành viên)  
 - **Hứa Nhựt Tuấn** (Nhóm trưởng) - MSSV: 51.01.104.114  
-- **Thành viên 2** - Phụ trách Thuật toán Welsh-Powell & DSATUR  
+- **Lê Văn Gia Bảo** - Phụ trách Thuật toán Welsh-Powell & DSATUR  
 - **Kiều Gia Bảo** - Phụ trách Thuật toán Backtracking & Bộ sinh đề  
-- **Thành viên 4** - Phụ trách Giao diện trực quan hóa GUI  
-- **Thành viên 5** - Phụ trách Thực nghiệm Benchmark, Slide & Media  
+- **Trần Phú Vinh** - Phụ trách Giao diện trực quan hóa GUI  
+- **Nguyễn Đăng Khoa** - Phụ trách Thực nghiệm Benchmark, Slide & Media  
 
 *Thành phố Hồ Chí Minh, Năm 2026*
 
@@ -54,10 +54,10 @@ Nhằm tuân thủ quy định liêm chính học thuật và tính minh bạch 
 | STT | Họ và tên | Module Mã nguồn phụ trách (Source/Release) | Nội dung Báo cáo & Tài liệu (Document) | Tỷ lệ đóng góp |
 | :---: | :--- | :--- | :--- | :---: |
 | **1** | **Hứa Nhựt Tuấn**<br>*(Nhóm trưởng)* | **Lớp `SudokuGraph`** (81 đỉnh, 810 cạnh, danh sách kề & ma trận kề 81x81), module **`IOHandler`** đọc/ghi file đề bài, **Game Validator** thời gian thực, **Solvability Checker**, **Hint Engine theo Heuristic DSATUR**, quản lý kho Git/GitHub tổng của nhóm. | **Phần Mở đầu**, **Toàn bộ Chương 2** (Mô hình hóa Sudoku bằng đồ thị & Phản biện học thuật); tổng hợp và chuẩn hóa thể thức toàn báo cáo. | 20% |
-| **2** | **Thành viên 2** | Cài đặt thuật toán `WelshPowell()` và `DSATUR()` thuần túy; module tính toán và cập nhật bậc bão hòa (`saturation_degree`). | Chương 1 (Mục 1.1, 1.2, 1.3.1, 1.3.2): Cơ sở lý thuyết đồ thị, sắc số, mã giả và sơ đồ khối Welsh-Powell, DSATUR. | 20% |
+| **2** | **Lê Văn Gia Bảo** | Cài đặt thuật toán `WelshPowell()` và `DSATUR()` thuần túy; module tính toán và cập nhật bậc bão hòa (`saturation_degree`). | Chương 1 (Mục 1.1, 1.2, 1.3.1, 1.3.2): Cơ sở lý thuyết đồ thị, sắc số, mã giả và sơ đồ khối Welsh-Powell, DSATUR. | 20% |
 | **3** | **Kiều Gia Bảo** | Cài đặt thuật toán `BacktrackDSATUR()` kết hợp Forward Checking; xây dựng module `GeneratePuzzle()` sinh đề 4 cấp độ có nghiệm duy nhất. | Chương 1 (Mục 1.3.3) và Chương 3 (Mục 3.2, 3.3): Thiết kế cấu trúc dữ liệu, lưu đồ thuật toán giải và sinh đề. | 20% |
-| **4** | **Thành viên 4** | Xây dựng giao diện bàn cờ 9x9, làm nổi bật 20 đỉnh kề khi chọn ô, hiển thị tập màu khả dụng, bậc bão hòa và chế độ chạy từng bước (Step-by-step). | Chương 3 (Mục 3.1, 3.4): Kiến trúc hệ thống, thiết kế giao diện; biên soạn cuốn Hướng dẫn sử dụng có ảnh chụp minh họa. | 20% |
-| **5** | **Thành viên 5** | Xây dựng bộ 40-100 đề Benchmark, module đo thời gian (ms), đếm số bước duyệt và số lần quay lui; đóng gói bản Release độc lập. | Chương 4 (Thực nghiệm & Đánh giá), Kết luận & Hướng phát triển, Tài liệu tham khảo; thiết kế Slide (.pptx) và dựng Video demo. | 20% |
+| **4** | **Trần Phú Vinh** | Xây dựng giao diện bàn cờ 9x9, làm nổi bật 20 đỉnh kề khi chọn ô, hiển thị tập màu khả dụng, bậc bão hòa và chế độ chạy từng bước (Step-by-step). | Chương 3 (Mục 3.1, 3.4): Kiến trúc hệ thống, thiết kế giao diện; biên soạn cuốn Hướng dẫn sử dụng có ảnh chụp minh họa. | 20% |
+| **5** | **Nguyễn Đăng Khoa** | Xây dựng bộ 40-100 đề Benchmark, module đo thời gian (ms), đếm số bước duyệt và số lần quay lui; đóng gói bản Release độc lập. | Chương 4 (Thực nghiệm & Đánh giá), Kết luận & Hướng phát triển, Tài liệu tham khảo; thiết kế Slide (.pptx) và dựng Video demo. | 20% |
 
 ---
 
