@@ -15,6 +15,7 @@ venv/
 env/
 
 # IDE & Editor files
+.vs/
 .vscode/
 .idea/
 *.suo
@@ -28,5 +29,6 @@ $RECYCLE.BIN/
 .DS_Store
 
 # Temporary files & logs
+~$*
 *.log
 plan_text.txt

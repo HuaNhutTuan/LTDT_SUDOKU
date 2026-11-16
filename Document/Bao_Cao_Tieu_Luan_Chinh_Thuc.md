@@ -266,6 +266,111 @@ Toàn bộ mã nguồn, tài liệu và bản phát hành của đồ án đư�
 ## 3.4 Thiết kế giao diện trực quan hóa quá trình tô màu
 *(Phần nội dung do Thành viên 4 biên soạn: Thiết kế lưới 9x9, tương tác chuột, tính năng highlight 20 đỉnh kề và thanh trượt tốc độ mô phỏng)*
 
+### 3.4.1 Mục tiêu thiết kế và nguyên lý trực quan hóa đồ thị
+Giao diện người dùng (GUI) của đồ án không đơn thuần là một bảng trò chơi Sudoku thông thường, mà được thiết kế như một **Công cụ trực quan hóa Lý thuyết đồ thị (Graph Visualization Tool)**. Mục tiêu cốt lõi là làm nổi bật bản chất toán học của đồ thị $G = (V, E)$ gồm 81 đỉnh và 810 cạnh:
+1. **Trực quan hóa tức thì cấu trúc lân cận:** Khi người dùng chọn bất kỳ ô cờ nào (tương ứng đỉnh $v \in V$), giao diện lập tức xác định và làm nổi bật đúng $20$ đỉnh kề $N(v)$ (gồm 8 đỉnh cùng hàng, 8 đỉnh cùng cột và 4 đỉnh cùng khối $3 \times 3$).
+2. **Minh bạch hóa các chỉ số động của thuật toán DSATUR:** Hiển thị trực quan bậc bão hòa hiện tại $\text{sat\_deg}(v)$ (số màu khác nhau đã xuất hiện ở các đỉnh kề) và miền màu khả dụng $\text{MRV}(v) = \{1..9\} \setminus \{c(u) \mid u \in N(v)\}$.
+3. **Mô phỏng từng bước (Step-by-step Animation):** Cho phép người học và giảng viên quan sát chi tiết từng quyết định chọn đỉnh có bậc bão hòa cao nhất, các bước gán màu thử nghiệm và các bước quay lui khi rơi vào bế tắc, với khả năng tùy chỉnh tốc độ trễ linh hoạt.
+
+### 3.4.2 Kiến trúc Module Giao diện (`SudokuGUI`)
+Module giao diện được xây dựng bằng thư viện chuẩn `tkinter` của Python nhằm đảm bảo tính độc lập tối đa, chạy trực tiếp trên mọi hệ thống mà không cần cài đặt thêm thư viện bên ngoài:
+- **Khung bàn cờ chính (Canvas 9x9):** Sử dụng `tk.Canvas` để vẽ lưới 81 ô với độ chính xác theo từng điểm ảnh (pixel-perfect). Các đường phân cách khối con $3 \times 3$ được vẽ nét đậm ($3\text{px}$, mã màu `#2f3640`) phân biệt rõ với các đường kẻ nội bộ ($1\text{px}$, mã màu `#dcdde1`).
+- **Khung Thanh tra đồ thị (Graph Inspector):** Bảng thông số bên phải cập nhật thời gian thực tọa độ đỉnh, chỉ số khối $3 \times 3$, bậc của đỉnh $\deg(v) = 20$, bậc bão hòa $\text{sat\_deg}(v)$ và tập màu hợp lệ còn lại.
+- **Game Validator thời gian thực:** Quét danh sách kề $N(v)$ ngay khi có sự thay đổi màu trên ô; nếu phát hiện trùng màu giữa 2 đỉnh kề, ô vi phạm lập tức chuyển màu đỏ cảnh báo kèm thông báo chi tiết vị trí xung đột.
+
+### 3.4.3 Cơ chế mô phỏng Step-by-step không gây nghẽn giao diện
+Để giải quyết bài toán giao diện bị đơ (freeze) khi thực thi thuật toán tìm kiếm đệ quy quay lui, module áp dụng kỹ thuật **Python Generator kết hợp vòng lặp sự kiện `root.after()`**:
+1. Thuật toán `_create_solve_generator()` được thiết kế dưới dạng hàm sinh (generator). Tại mỗi bước chọn đỉnh, gán màu hoặc quay lui, generator phát ra (`yield`) một gói trạng thái: `(action, vertex, color, description)` trong đó `action` thuộc `{'assign', 'backtrack', 'done'}`.
+2. Phương thức điều phối `_run_auto_step()` lấy từng bước từ generator, cập nhật lại màu sắc đỉnh và bảng thông số trên Canvas, sau đó lên lịch gọi bước tiếp theo thông qua hàm phi nghẽn `root.after(delay_ms, ...)`.
+3. Người dùng có thể toàn quyền can thiệp vào quá trình chạy: bấm **"Tạm dừng (Pause)"**, thực hiện **"Bước tiếp (Step)"** thủ công để phân tích kỹ từng nước đi, hoặc kéo thanh trượt **Tốc độ trễ (Speed Slider: 10ms – 500ms)** để tăng/giảm tốc độ mô phỏng.
+
+#### Mã giả Thuật toán Step-by-step DSATUR Backtracking
+```text
+Mã giả Thuật toán Step-by-step DSATUR Backtracking (Thành viên 4):
+Input:  Đồ thị SudokuGraph G = (V, E) với các đỉnh tiền tô màu ban đầu.
+Output: Generator phát ra từng bước ('assign', 'backtrack', 'done') cho GUI.
+
+Hàm Sinh SolveStepGenerator(G):
+1.   uncolored = G.get_uncolored_vertices();
+2.   Nếu uncolored rỗng:
+3.       YIELD ('done', None, None, "Bàn cờ đã giải hoàn tất!");
+4.       Trả về TRUE;
+5.   candidates = [];
+6.   Với mỗi đỉnh v thuộc uncolored:
+7.       avail = G.get_available_colors(v); // Miền màu khả dụng MRV
+8.       sat = G.get_saturation_degree(v);  // Bậc bão hòa DSATUR
+9.       candidates.append((v, sat, |avail|, avail));
+10.  Sắp xếp candidates theo: min(|avail|), max(sat);
+11.  best_v = đỉnh đầu tiên trong candidates;
+12.  Nếu |avail| của best_v == 0:
+13.      Trả về FALSE; // Bế tắc ngõ cụt, cần quay lui
+14.  Với mỗi color trong miền khả dụng của best_v:
+15.      G.colors[best_v] = color;
+16.      YIELD ('assign', best_v, color, "Gán màu cho đỉnh");
+17.      sub_gen = SolveStepGenerator(G);
+18.      Với mỗi step trong sub_gen:
+19.          YIELD step;
+20.          Nếu step.action == 'done': Trả về TRUE;
+21.      G.colors[best_v] = 0; // Hoàn tác gán màu (Backtrack)
+22.      YIELD ('backtrack', best_v, color, "Quay lui tại đỉnh");
+23.  Trả về FALSE;
+```
+
+#### Sơ đồ khối logic hoạt động của chế độ Step-by-step
+```text
++----------------------------------------------------------+
+|                     BẮT ĐẦU (START)                      |
++----------------------------------------------------------+
+                               |
+                               v
++----------------------------------------------------------+
+| Bước 1: Khởi tạo Generator;                              |
+| Kiểm tra tính hợp lệ tiền tô màu trên 20 đỉnh kề         |
++----------------------------------------------------------+
+                               |
+                               v
++----------------------------------------------------------+
+| Còn đỉnh nào chưa được tô màu không?                     |
++----------------------------------------------------------+
+                 | (Còn)                            | (Hết)
+                 v                                  v
++----------------------------+      +----------------------+
+| Bước 2: Tính sat_deg & MRV |      | KẾT THÚC (SUCCESS)   |
+| Chọn v* có min(|MRV|)      |      | Bàn cờ hợp lệ 100%   |
+| Tiêu chí phụ: max(sat_deg) |      +----------------------+
++----------------------------+
+                 |
+         +-------+--------------------+
+         | (|MRV| > 0)                | (|MRV| == 0: Bế tắc)
+         v                            v
++---------------------------+  +---------------------------+
+| Bước 3: Thử gán màu c*    |  | BẾ TẮC: Hết màu khả dụng  |
+| YIELD ('assign', v*, c*)  |  | YIELD ('backtrack', v*,c*)|
+| Canvas vẽ ô màu Vàng cam  |  | Hủy gán: colors[v*] = 0   |
++---------------------------+  +---------------------------+
+                 |                              ^
+                 v                              | (Nhánh sai)
++-----------------------------------------------+
+| Gọi đệ quy giải tiếp đỉnh tiếp theo           |
++-----------------------------------------------+
+                 |
+                 v
++----------------------------------------------------------+
+| root.after(delay_ms): Hẹn giờ gọi bước tiếp phi nghẽn    |
++----------------------------------------------------------+
+```
+
+### 3.4.4 Bảng quy ước màu sắc hiển thị trên bàn cờ
+| Trạng thái đỉnh / ô cờ | Màu nền (Background) | Màu chữ (Foreground) | Ý nghĩa đồ thị |
+|:---|:---:|:---:|:---|
+| **Ô bình thường** | Trắng (`#ffffff`) | Xanh đen / Đen | Đỉnh chưa tô màu hoặc đã tô hợp lệ |
+| **Ô đang chọn ($v$)** | Xanh dương (`#74b9ff`) | Trắng / Đậm | Đỉnh được người dùng click chọn kiểm tra |
+| **20 đỉnh kề ($N(v)$)** | Xanh nhạt (`#e8f4fc`) | Theo trạng thái | 20 đỉnh có cạnh nối trực tiếp với đỉnh đang chọn |
+| **Ô tiền tô màu** | Trắng xám (`#f8f9fa`) | Xanh đậm (`#192a56`) | Đỉnh có màu cố định của đề bài ban đầu |
+| **Ô đang xử lý (Step)** | Vàng cam (`#ffeaa7`) | Xanh đen | Đỉnh đang được thuật toán DSATUR gán màu/quay lui |
+| **Ô được gợi ý (Hint)** | Xanh ngọc (`#55efc4`) | Đen đậm | Đỉnh tối ưu được Hint Engine đề xuất |
+| **Ô xung đột màu** | Đỏ nhạt (`#ff7675`) | Đỏ đậm (`#c23616`) | Vi phạm định lý tô màu: 2 đỉnh kề mang cùng một màu |
+
 ---
 
 # CHƯƠNG 4. THỰC NGHIỆM VÀ ĐÁNH GIÁ KẾT QUẢ

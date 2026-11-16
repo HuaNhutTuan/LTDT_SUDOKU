@@ -25,36 +25,50 @@ LTDT_SUDOKU/
 ├── Document/                               # Thư mục Báo cáo & Tài liệu
 │   ├── Bao_Cao_Tieu_Luan_Sudoku_To_Mau_Do_Thi.docx  # Báo cáo chuẩn thể thức HCMUE (A4, TNR 13pt, lề chuẩn)
 │   ├── Bao_Cao_Tieu_Luan_Chinh_Thuc.md      # Toàn văn báo cáo tiểu luận tích hợp đầy đủ 4 chương
+│   ├── Huong_Dan_Su_Dung_GUI.md            # Tài liệu Hướng dẫn sử dụng Giao diện đồ họa (TV4)
 │   ├── Noi_Dung_Bao_Cao_Phan_Mo_Dau_Va_Chuong_2.md  # Bản thảo chi tiết Mở đầu và Chương 2
 │   ├── Noi_Dung_Bao_Cao_Chuong_4_Thuc_Nghiem.md     # Bản thảo chi tiết Chương 4 Thực nghiệm (Thành viên 5)
 │   ├── Slide_Thuyet_Trinh_Thanh_Vien_5.md  # Dàn ý 18 slide, kịch bản thuyết trình và Q&A Thành viên 5
-│   └── Ke_Hoach_Thuc_Hien_Do_An_Sudoku_To_Mau_Do_Thi.docx # Bản kế hoạch phân công chi tiết 5 thành viên
+│   ├── Ke_Hoach_Thuc_Hien_Do_An_Sudoku_To_Mau_Do_Thi.docx # Bản kế hoạch phân công chi tiết 5 thành viên
+│   └── generate_report.py                  # Script sinh tự động file Word báo cáo theo quy chuẩn HCMUE
 ├── Source/                                 # Toàn bộ mã nguồn chương trình
-│   ├── main.py                             # Điểm khởi chạy Console minh họa lõi đồ thị
+│   ├── main.py                             # Điểm khởi chạy Console minh họa tổng hợp các giải thuật
 │   ├── benchmark_runner.py                 # Bộ chạy kiểm thử đối sánh 3 giải thuật trên 40 đề (Thành viên 5)
 │   ├── core/                               # Lõi xử lý đồ thị (Graph Core)
 │   │   ├── graph.py                        # Lớp Graph vô hướng tổng quát
 │   │   ├── sudoku_graph.py                 # Lớp SudokuGraph (81 đỉnh, 810 cạnh, 20 đỉnh kề, DSATUR, tiền tô màu)
 │   │   ├── io_handler.py                   # Đọc/ghi đề bài Sudoku (ma trận 9x9, chuỗi 81 ký tự, dataset benchmark)
 │   │   └── benchmark.py                    # Module đo thời gian (ms), đếm bước gán màu, quay lui, 3 giải thuật
+│   ├── algorithms/                         # Các giải thuật tô màu đồ thị (Graph Coloring Algorithms)
+│   │   ├── __init__.py                     # Module khởi tạo package algorithms
+│   │   ├── welsh_powell.py                 # Thuật toán Welsh-Powell tham lam tĩnh theo bậc (TV2)
+│   │   ├── dsatur.py                       # Thuật toán DSATUR tham lam động theo bậc bão hòa (TV2)
+│   │   └── backtrack_dsatur.py             # Thuật toán Backtrack kết hợp Forward Checking & DSATUR/MRV (TV3)
+│   ├── gui/                                # Giao diện đồ họa người dùng (Tkinter GUI - TV4)
+│   │   ├── __init__.py                     # Module khởi tạo package GUI
+│   │   └── sudoku_gui.py                   # Lớp SudokuGUI (Canvas 9x9, highlight 20 đỉnh kề, DSATUR step-by-step)
 │   └── tests/                              # Bộ kiểm thử tự động (Unit Tests)
 │       ├── test_sudoku_graph.py            # Test nghiệm thu TV1: 81 đỉnh, 810 cạnh, bậc 20, bắt lỗi tiền tô màu
+│       ├── test_tv2_algorithms.py          # Test nghiệm thu TV2: Welsh-Powell, DSATUR, bậc bão hòa
+│       ├── test_backtrack_dsatur.py        # Test nghiệm thu TV3: Backtrack DSATUR trên 4 cấp độ
 │       └── test_benchmark.py               # Test nghiệm thu TV5: đo lường thời gian, 3 giải thuật, dataset 40 đề
-└── Release/                                # Bản đóng gói thực thi & bộ dữ liệu mẫu
-    ├── puzzles/                            # Các bộ đề kiểm thử chuẩn 4 cấp độ khó
-    │   ├── benchmark_40.txt                # Tập trung 40 đề chuẩn phân bổ đều 4 cấp độ (10 Dễ, 10 TB, 10 Khó, 10 Chuyên gia)
-    │   ├── easy_10.txt                     # Bộ 10 đề Dễ (36 clues)
-    │   ├── medium_10.txt                   # Bộ 10 đề Trung bình (32 clues)
-    │   ├── hard_10.txt                     # Bộ 10 đề Khó (26 clues)
-    │   ├── expert_10.txt                   # Bộ 10 đề Chuyên gia (17-25 clues: Gordon Royle 17s, AI Escargot,...)
-    │   ├── sample_easy.txt                 # Đề Dễ mẫu
-    │   ├── sample_medium.txt               # Đề Trung bình mẫu
-    │   ├── sample_hard.txt                 # Đề Khó mẫu
-    │   └── sample_expert.txt               # Đề Chuyên gia mẫu (17 clues)
-    ├── benchmark_results.csv               # Bảng số liệu chi tiết 120 lượt chạy thực nghiệm
-    ├── benchmark_summary.json              # File JSON tổng hợp chỉ số hiệu năng
-    ├── run_console.bat                     # File thực thi chạy nhanh Console trên Windows
-    └── run_benchmark.bat                   # File thực thi chạy nhanh Benchmark 40 đề trên Windows
+├── Release/                                # Bản đóng gói thực thi & bộ dữ liệu mẫu
+│   ├── puzzles/                            # Các bộ đề kiểm thử chuẩn 4 cấp độ khó
+│   │   ├── benchmark_40.txt                # Tập hợp 40 đề chuẩn phân bổ đều 4 cấp độ (10 Dễ, 10 TB, 10 Khó, 10 Chuyên gia)
+│   │   ├── easy_10.txt                     # Bộ 10 đề Dễ (36 clues)
+│   │   ├── medium_10.txt                   # Bộ 10 đề Trung bình (32 clues)
+│   │   ├── hard_10.txt                     # Bộ 10 đề Khó (26 clues)
+│   │   ├── expert_10.txt                   # Bộ 10 đề Chuyên gia (17-25 clues: Gordon Royle 17s, AI Escargot,...)
+│   │   ├── sample_easy.txt                 # Đề Dễ mẫu
+│   │   ├── sample_medium.txt               # Đề Trung bình mẫu
+│   │   ├── sample_hard.txt                 # Đề Khó mẫu
+│   │   └── sample_expert.txt               # Đề Chuyên gia mẫu (17 clues)
+│   ├── benchmark_results.csv               # Bảng số liệu chi tiết 120 lượt chạy thực nghiệm
+│   ├── benchmark_summary.json              # File JSON tổng hợp chỉ số hiệu năng
+│   ├── run_console.bat                     # File thực thi chạy Console trên Windows
+│   ├── run_benchmark.bat                   # File thực thi chạy Benchmark 40 đề trên Windows
+│   └── run_gui.bat                         # File thực thi chạy Giao diện GUI trên Windows (TV4)
+└── run_gui.py                              # Script khởi chạy GUI trực tiếp từ thư mục gốc
 ```
 
 ---
@@ -64,10 +78,10 @@ LTDT_SUDOKU/
 | STT | Thành viên & Vai trò | Module Code phụ trách | Báo cáo Tiểu luận | Trạng thái |
 |:---:|:---|:---|:---|:---:|
 | **1** | **Hứa Nhựt Tuấn** *(Nhóm trưởng)* | Lớp `SudokuGraph`, `IOHandler`, Game Validator, Solvability Checker, Hint Engine, quản lý GitHub | Mở đầu, toàn bộ Chương 2, chuẩn hóa file Word theo quy chuẩn HCMUE | **Hoàn thành 100%** |
-| **2** | **Thành viên 2** *(Tham lam & DSATUR)* | Hàm `WelshPowell()` & `DSATUR()`, cập nhật bậc bão hòa | Chương 1 (Mục 1.1, 1.2, 1.3.1, 1.3.2) | Đang thực hiện |
-| **3** | **Thành viên 3** *(Backtrack & Generator)* | Hàm `BacktrackDSATUR()`, sinh đề `GeneratePuzzle()` 4 cấp độ | Chương 1 (Mục 1.3.3), Chương 3 (Mục 3.2, 3.3) | Đang thực hiện |
-| **4** | **Thành viên 4** *(Giao diện GUI)* | Bàn cờ 9x9, highlight 20 đỉnh kề, step-by-step | Chương 3 (Mục 3.1, 3.4), Hướng dẫn sử dụng | Đang thực hiện |
-| **5** | **Thành viên 5** *(Benchmark & Media)* | Bộ 40 đề Benchmark, module đo thời gian/bước duyệt/quay lui, đóng gói Release | Toàn bộ Chương 4 (Thực nghiệm & Đánh giá), Slide outline & Kịch bản Q&A | **Hoàn thành 100% (Tuần 1)** |
+| **2** | **Lê Văn Gia Bảo** *(Tham lam & DSATUR)* | Hàm `WelshPowell()` & `DSATUR()`, cập nhật bậc bão hòa | Chương 1 (Mục 1.1, 1.2, 1.3.1, 1.3.2) | **Hoàn thành 100% (Tuần 1)** |
+| **3** | **Kiều Gia Bảo** *(Backtrack & Generator)* | Hàm `BacktrackDSATUR()`, sinh đề `GeneratePuzzle()` 4 cấp độ | Chương 1 (Mục 1.3.3), Chương 3 (Mục 3.2, 3.3) | **Hoàn thành 100% (Tuần 1)** |
+| **4** | **Trần Phú Vinh** *(Giao diện GUI)* | Bàn cờ 9x9, highlight 20 đỉnh kề, step-by-step DSATUR | Chương 3 (Mục 3.1, 3.4), Hướng dẫn sử dụng | **Hoàn thành 100% (Tuần 1)** |
+| **5** | **Nguyễn Đăng Khoa** *(Benchmark & Media)* | Bộ 40 đề Benchmark, module đo thời gian/bước duyệt/quay lui, đóng gói Release | Toàn bộ Chương 4 (Thực nghiệm & Đánh giá), Slide outline & Kịch bản Q&A | **Hoàn thành 100% (Tuần 1)** |
 
 ---
 
@@ -163,4 +177,9 @@ print(f"Trạng thái: {sol_info['status']} ({sol_info['solutions_count']} nghi�
   ```bash
   python Source/main.py
   ```
-- **Trên Windows:** Click đúp vào file `Release/run_console.bat` để chạy nhanh.
+- **Chạy Giao diện đồ họa người dùng (GUI - Thành viên 4):**
+  ```bash
+  python run_gui.py
+  # Hoặc click đúp file: Release/run_gui.bat
+  ```
+- **Trên Windows:** Click đúp vào file `Release/run_console.bat` hoặc `Release/run_gui.bat` để chạy nhanh.
