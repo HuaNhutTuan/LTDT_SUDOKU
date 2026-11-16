@@ -17,7 +17,7 @@
 **Nhóm sinh viên thực hiện:** Nhóm Đồ án Sudoku (5 thành viên)  
 - **Hứa Nhựt Tuấn** (Nhóm trưởng) - MSSV: 51.01.104.114  
 - **Thành viên 2** - Phụ trách Thuật toán Welsh-Powell & DSATUR  
-- **Thành viên 3** - Phụ trách Thuật toán Backtracking & Bộ sinh đề  
+- **Kiều Gia Bảo** - Phụ trách Thuật toán Backtracking & Bộ sinh đề  
 - **Thành viên 4** - Phụ trách Giao diện trực quan hóa GUI  
 - **Thành viên 5** - Phụ trách Thực nghiệm Benchmark, Slide & Media  
 
@@ -55,7 +55,7 @@ Nhằm tuân thủ quy định liêm chính học thuật và tính minh bạch 
 | :---: | :--- | :--- | :--- | :---: |
 | **1** | **Hứa Nhựt Tuấn**<br>*(Nhóm trưởng)* | **Lớp `SudokuGraph`** (81 đỉnh, 810 cạnh, danh sách kề & ma trận kề 81x81), module **`IOHandler`** đọc/ghi file đề bài, **Game Validator** thời gian thực, **Solvability Checker**, **Hint Engine theo Heuristic DSATUR**, quản lý kho Git/GitHub tổng của nhóm. | **Phần Mở đầu**, **Toàn bộ Chương 2** (Mô hình hóa Sudoku bằng đồ thị & Phản biện học thuật); tổng hợp và chuẩn hóa thể thức toàn báo cáo. | 20% |
 | **2** | **Thành viên 2** | Cài đặt thuật toán `WelshPowell()` và `DSATUR()` thuần túy; module tính toán và cập nhật bậc bão hòa (`saturation_degree`). | Chương 1 (Mục 1.1, 1.2, 1.3.1, 1.3.2): Cơ sở lý thuyết đồ thị, sắc số, mã giả và sơ đồ khối Welsh-Powell, DSATUR. | 20% |
-| **3** | **Thành viên 3** | Cài đặt thuật toán `BacktrackDSATUR()` kết hợp Forward Checking; xây dựng module `GeneratePuzzle()` sinh đề 4 cấp độ có nghiệm duy nhất. | Chương 1 (Mục 1.3.3) và Chương 3 (Mục 3.2, 3.3): Thiết kế cấu trúc dữ liệu, lưu đồ thuật toán giải và sinh đề. | 20% |
+| **3** | **Kiều Gia Bảo** | Cài đặt thuật toán `BacktrackDSATUR()` kết hợp Forward Checking; xây dựng module `GeneratePuzzle()` sinh đề 4 cấp độ có nghiệm duy nhất. | Chương 1 (Mục 1.3.3) và Chương 3 (Mục 3.2, 3.3): Thiết kế cấu trúc dữ liệu, lưu đồ thuật toán giải và sinh đề. | 20% |
 | **4** | **Thành viên 4** | Xây dựng giao diện bàn cờ 9x9, làm nổi bật 20 đỉnh kề khi chọn ô, hiển thị tập màu khả dụng, bậc bão hòa và chế độ chạy từng bước (Step-by-step). | Chương 3 (Mục 3.1, 3.4): Kiến trúc hệ thống, thiết kế giao diện; biên soạn cuốn Hướng dẫn sử dụng có ảnh chụp minh họa. | 20% |
 | **5** | **Thành viên 5** | Xây dựng bộ 40-100 đề Benchmark, module đo thời gian (ms), đếm số bước duyệt và số lần quay lui; đóng gói bản Release độc lập. | Chương 4 (Thực nghiệm & Đánh giá), Kết luận & Hướng phát triển, Tài liệu tham khảo; thiết kế Slide (.pptx) và dựng Video demo. | 20% |
 
@@ -137,10 +137,49 @@ Nội dung báo cáo tiểu luận được tổ chức thành 4 chương chính
 ### 1.3.2 Thuật toán DSATUR (Degree of Saturation)
 *(Phần nội dung do Thành viên 2 biên soạn: Khái niệm bậc bão hòa, cơ chế cập nhật động, mã giả) [2]*
 ### 1.3.3 Thuật toán Quay lui kết hợp Forward Checking và Heuristic DSATUR/MRV
-*(Phần nội dung do Thành viên 3 biên soạn: Chiến lược tìm kiếm quay lui, cắt tỉa miền giá trị)*
 
+#### a) Cơ sở lý thuyết và động cơ cải tiến
+Các thuật toán tô màu tham lam cục bộ như Welsh-Powell hoặc DSATUR thuần túy (không quay lui) thường rơi vào trạng thái bế tắc (deadlock) khi giải các bảng Sudoku ở cấp độ Khó và Chuyên gia do cấu trúc đồ thị chính quy bậc 20 có ràng buộc tiền tô màu chặt chẽ. Ngược lại, thuật toán Quay lui (Backtracking) cổ điển duyệt tuần tự theo chỉ số đỉnh từ $0$ đến $80$ lại tạo ra cây tìm kiếm có kích thước bùng nổ theo hàm mũ ($O(9^m)$ với $m$ là số đỉnh chưa tô), dẫn đến chi phí tính toán lớn.
+
+Để giải quyết triệt để bài toán Mở rộng tiền tô màu (Pre-coloring Extension) với $k = 9$ màu trên đồ thị Sudoku, thuật toán đề xuất tích hợp **Tìm kiếm quay lui (Backtracking)** cùng hai cơ chế tối ưu hóa không gian trạng thái:
+
+1. **Chiến lược chọn đỉnh động DSATUR kết hợp MRV (Minimum Remaining Values):**
+   Tại mỗi bước đệ quy, thay vì chọn đỉnh cố định, thuật toán đánh giá toàn bộ tập đỉnh chưa tô màu và ưu tiên chọn đỉnh $v$ có **bậc bão hòa $sat\_deg(v)$ lớn nhất** (số lượng màu phân biệt đã xuất hiện ở 20 đỉnh kề)[cite: 1, 4]. Trong trường hợp có nhiều đỉnh cùng đạt bậc bão hòa cực đại, tiêu chí phụ là chọn đỉnh có **số lượng màu khả dụng còn lại ít nhất** ($\min \vert{}D(v)\vert{}$, tức heuristic MRV)[cite: 1]. Nguyên tắc *"chọn biến bị ràng buộc chặt nhất trước"* giúp ép các xung đột phát sinh ở độ sâu nông nhất, thu hẹp tối đa hệ số nhánh của cây tìm kiếm[cite: 1].
+
+2. **Kỹ thuật Kiểm tra tiến (Forward Checking – Cắt tỉa miền giá trị):**
+   Mỗi đỉnh $v \in V$ được duy trì một tập miền giá trị hợp lệ $D(v) \subseteq \{1, 2, \dots, 9\}$[cite: 1, 4]. Ngay khi thử gán màu $c \in D(v)$ cho đỉnh $v$, thuật toán chủ động lan truyền ràng buộc bằng cách loại bỏ màu $c$ khỏi miền giá trị $D(u)$ của tất cả các đỉnh kề $u \in N(v)$ chưa được tô màu[cite: 1]. Nếu tồn tại bất kỳ đỉnh kề $u$ nào bị rỗng miền giá trị ($\vert{}D(u)\vert{} = 0$), nhánh tìm kiếm hiện tại chắc chắn không thể mở rộng thành nghiệm hợp lệ và lập tức bị cắt tỉa để quay lui (backtrack) ngay mà không cần đi sâu thêm[cite: 1].
+
+#### b) Mã giả thuật toán (Pseudocode)
+
+```text
+Thuật toán: Backtrack_DSATUR_FC(G, Domains)
+Đầu vào: Đồ thị Sudoku G = (V, E) đã tiền tô màu; mảng miền giá trị Domains[0..80]
+Đầu ra: True nếu tô màu hợp lệ toàn bộ 81 đỉnh, False nếu vô nghiệm
+
+1.  Nếu Domains rỗng (toàn bộ 81 đỉnh đã được gán màu hợp lệ):
+2.      Trả về True
+3.  v <- Đỉnh chưa tô có Bậc bão hòa lớn nhất (ưu tiên |Domains[v]| nhỏ nhất nếu bằng nhau)
+4.  Với mỗi màu c thuộc Domains[v]:
+5.      Gán màu c cho đỉnh v
+6.      Pruned <- Danh sách rỗng
+7.      IsValid <- True
+8.      Với mỗi đỉnh kề u thuộc N(v) chưa tô màu:
+9.          Nếu c thuộc Domains[u]:
+10.             Loại bỏ c khỏi Domains[u]
+11.             Thêm u vào Pruned
+12.             Nếu |Domains[u]| == 0:
+13.                 IsValid <- False
+14.                 Thoát vòng lặp kiểm tra đỉnh kề
+15.     Nếu IsValid == True:
+16.         Nếu Backtrack_DSATUR_FC(G, Domains) == True:
+17.             Trả về True
+18.     // Quay lui (Backtrack) và khôi phục miền giá trị
+19.     Với mỗi đỉnh u thuộc Pruned:
+20.         Thêm lại màu c vào Domains[u]
+21.     Hủy gán màu của đỉnh v (đặt về 0)
+22. Trả về False
 ---
-
+```
 # CHƯƠNG 2. MÔ HÌNH HÓA BÀI TOÁN SUDOKU BẰNG LÝ THUYẾT ĐỒ THỊ
 
 ## 2.1 Quy tắc trò chơi Sudoku 9x9 và bài toán tổng quát n² × n²
@@ -258,7 +297,7 @@ Toàn bộ mã nguồn, tài liệu và bản phát hành của đồ án đư�
 - **Thư mục Release:** Chứa file thực thi độc lập (.exe), tệp batch chạy nhanh trên Windows và bộ đề kiểm thử 4 cấp độ.
 
 ## 3.2 Thiết kế cấu trúc dữ liệu biểu diễn đồ thị và bảng màu
-*(Phần nội dung do Thành viên 3 biên soạn: Chi tiết lớp SudokuGraph, mảng màu colors[], mảng is_precolored[], mảng saturationDegree[], danh sách kề adjacencyList)*
+*(Phần nội dung do Kiều Gia Bảo biên soạn: Chi tiết lớp SudokuGraph, mảng màu colors[], mảng is_precolored[], mảng saturationDegree[], danh sách kề adjacencyList)*
 
 ## 3.3 Chi tiết cài đặt các thuật toán giải và sinh đề
 *(Phần nội dung do Thành viên 2 & 3 biên soạn: Mã giả ngắn gọn 10-20 dòng, lưu đồ và giải thích code Welsh-Powell, DSATUR, BacktrackDSATUR và GeneratePuzzle)*

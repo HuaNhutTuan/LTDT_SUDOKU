@@ -54,7 +54,7 @@ LTDT_SUDOKU/
 |:---:|:---|:---|:---|:---:|
 | **1** | **Hứa Nhựt Tuấn**<br>*(Nhóm trưởng - Kiến trúc & Đồ thị)* | **Lớp `SudokuGraph`** (81 đỉnh, 810 cạnh, danh sách kề & ma trận kề 81x81), module **`IOHandler`** đọc/ghi file đề bài, kiểm tra tính hợp lệ tiền tô màu (**`validate_precoloring`**), quản lý kho Git/GitHub tổng. | **Phần Mở đầu**, **Toàn bộ Chương 2** (Mô hình hóa bài toán Sudoku bằng lý thuyết đồ thị); tổng hợp và chuẩn hóa thể thức Word toàn báo cáo. | **100% (Đã nghiệm thu)** |
 | **2** | **Thành viên 2**<br>*(Thuật toán Tham lam & DSATUR)* | Cài đặt hàm `WelshPowell()` và `DSATUR()` thuần túy; hàm tính và cập nhật bậc bão hòa (`saturation_degree`). | Chương 1 (Mục 1.1, 1.2, 1.3.1, 1.3.2): Cơ sở lý thuyết đồ thị, sắc số, mã giả và sơ đồ khối Welsh-Powell, DSATUR. | Đang tiến hành |
-| **3** | **Thành viên 3**<br>*(Quay lui + Heuristic & Sinh đề)* | Cài đặt hàm `BacktrackDSATUR()` kết hợp Forward Checking; xây dựng module `GeneratePuzzle()` sinh đề 4 cấp độ có nghiệm duy nhất. | Chương 1 (Mục 1.3.3) và Chương 3 (Mục 3.2, 3.3): Thiết kế cấu trúc dữ liệu, lưu đồ thuật toán giải và sinh đề. | Đang tiến hành |
+| **3** | **Kiều Gia Bảo**<br>*(Quay lui + Heuristic & Sinh đề)* | Cài đặt hàm `BacktrackDSATUR()` kết hợp Forward Checking; xây dựng module `GeneratePuzzle()` sinh đề 4 cấp độ có nghiệm duy nhất. | Chương 1 (Mục 1.3.3) và Chương 3 (Mục 3.2, 3.3): Thiết kế cấu trúc dữ liệu, lưu đồ thuật toán giải và sinh đề. | Đang tiến hành |
 | **4** | **Thành viên 4**<br>*(Giao diện GUI & Trực quan hóa)* | Xây dựng giao diện bàn cờ 9x9, làm nổi bật 20 đỉnh kề khi chọn ô, hiển thị tập màu khả dụng, bậc bão hòa và chế độ chạy từng bước (Step-by-step). | Chương 3 (Mục 3.1, 3.4): Kiến trúc hệ thống, thiết kế giao diện; biên soạn cuốn Hướng dẫn sử dụng có ảnh chụp minh họa. | Đang tiến hành |
 | **5** | **Thành viên 5**<br>*(Thực nghiệm, Benchmark & Media)* | Xây dựng bộ 40-100 đề Benchmark, module đo thời gian (ms), đếm số bước duyệt và số lần quay lui; đóng gói bản Release độc lập. | Chương 4 (Thực nghiệm & Đánh giá), Kết luận & Hướng phát triển, Tài liệu tham khảo; thiết kế Slide (.pptx) và dựng Video demo. | Đang tiến hành |
 
@@ -140,7 +140,7 @@ Lưới Sudoku 9x9 gồm 81 ô vuông phân thành 9 khối con $3 \times 3$, th
 
 ## VI. KHUNG NỘI DUNG CÁC CHƯƠNG TIẾP THEO DÀNH CHO CÁC THÀNH VIÊN
 
-- **Chương 1: Cơ sở lý thuyết** (Thành viên 2 và Thành viên 3 biên soạn): Định nghĩa đồ thị, sắc số, mã giả và sơ đồ khối 3 thuật toán.
-- **Chương 3: Thiết kế và cài đặt chương trình** (Thành viên 3 và Thành viên 4 biên soạn): Kiến trúc 3 tầng, cấu trúc dữ liệu, giao diện trực quan hóa và bộ sinh đề.
+- **Chương 1: Cơ sở lý thuyết** (Thành viên 2 và Kiều Gia Bảo biên soạn): Định nghĩa đồ thị, sắc số, mã giả và sơ đồ khối 3 thuật toán.
+- **Chương 3: Thiết kế và cài đặt chương trình** (Kiều Gia Bảo và Thành viên 4 biên soạn): Kiến trúc 3 tầng, cấu trúc dữ liệu, giao diện trực quan hóa và bộ sinh đề.
 - **Chương 4: Thực nghiệm và đánh giá kết quả** (Thành viên 5 biên soạn): Bảng số liệu benchmark, biểu đồ so sánh thời gian chạy, số bước duyệt và số lần quay lui trên 40 đề kiểm thử.
 - **Kết luận, Hướng phát triển và Tài liệu tham khảo:** Toàn nhóm tổng hợp trước ngày nộp bài.

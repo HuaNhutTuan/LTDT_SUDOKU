@@ -18,7 +18,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from Source.core.sudoku_graph import SudokuGraph, PrecoloringConflictError
 from Source.core.io_handler import IOHandler
-
+from Source.algorithms.backtrack_dsatur import BacktrackDSATURSolver
 
 def print_banner():
     print("=" * 70)
@@ -121,6 +121,13 @@ def demonstrate_graph_core():
     print("  TV3 (Backtrack + Generator), TV4 (GUI) và TV5 (Benchmark).")
     print("=" * 70)
 
+    print("\n[BƯỚC 9] KIỂM THỬ THUẬT TOÁN BACKTRACKING + FORWARD CHECKING + DSATUR (TV3):")
+    solver = BacktrackDSATURSolver(graph, record_steps=False)
+    result = solver.solve()
+    print(f"  + Trạng thái giải: {'THÀNH CÔNG' if result['solved'] else 'THẤT BẠI'}")
+    print(f"  + Tổng số bước thử gán màu: {result['steps']}")
+    print(f"  + Tổng số lần quay lui: {result['backtracks']}")
+    graph.display("KẾT QUẢ GIẢI SUDOKU HOÀN CHỈNH")
 
 if __name__ == "__main__":
     demonstrate_graph_core()

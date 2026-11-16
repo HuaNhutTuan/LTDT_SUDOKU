@@ -98,7 +98,7 @@ def create_report():
         "Nhóm thực hiện:        Nhóm Đồ án Sudoku (5 thành viên)\n"
         "Nhóm trưởng:           Hứa Nhựt Tuấn   - MSSV: 51.01.104.114\n"
         "Thành viên 2:          Thành viên 2    - Thuật toán Welsh-Powell & DSATUR\n"
-        "Thành viên 3:          Thành viên 3    - Backtracking + Heuristic & Sinh đề\n"
+        "Kiều Gia Bảo:          Kiều Gia Bảo    - Backtracking + Heuristic & Sinh đề\n"
         "Thành viên 4:          Thành viên 4    - Giao diện trực quan hóa GUI\n"
         "Thành viên 5:          Thành viên 5    - Thực nghiệm, Benchmark & Media\n\n\n\n"
     )
@@ -209,7 +209,7 @@ def create_report():
         ),
         (
             "3",
-            "Thành viên 3",
+            "Kiều Gia Bảo",
             "Cài đặt thuật toán BacktrackDSATUR kết hợp Forward Checking; xây dựng module GeneratePuzzle sinh đề 4 cấp độ.",
             "Chương 1 (Mục 1.3.3) và Chương 3 (Mục 3.2, 3.3): Cấu trúc dữ liệu, lưu đồ giải và sinh đề.",
             "Đang thực hiện"
@@ -386,7 +386,7 @@ def create_report():
     p.italic = True
 
     doc.add_heading("1.3.3 Thuật toán Quay lui kết hợp Forward Checking và Heuristic DSATUR/MRV", level=3)
-    p = doc.add_paragraph("[Nội dung do Thành viên 3 biên soạn: Chiến lược tìm kiếm quay lui, cắt tỉa không gian trạng thái, bảo đảm tìm nghiệm 100%]")
+    p = doc.add_paragraph("[Nội dung do Kiều Gia Bảo biên soạn: Chiến lược tìm kiếm quay lui, cắt tỉa không gian trạng thái, bảo đảm tìm nghiệm 100%]")
     p.italic = True
 
     doc.add_page_break()
