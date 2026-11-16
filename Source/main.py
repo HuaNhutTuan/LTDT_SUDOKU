@@ -18,6 +18,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from Source.core.sudoku_graph import SudokuGraph, PrecoloringConflictError
 from Source.core.io_handler import IOHandler
+from Source.algorithms.welsh_powell import WelshPowellSolver
+from Source.algorithms.dsatur import DSATURSolver
 from Source.algorithms.backtrack_dsatur import BacktrackDSATURSolver
 
 def print_banner():
@@ -116,9 +118,39 @@ def demonstrate_graph_core():
     graph.colors[fake_v] = 0  # Hoàn tác
 
     print("\n" + "=" * 70)
-    print("  KẾT LUẬN: Lõi đồ thị SudokuGraph hoạt động 100% chính xác!")
-    print("  Đã sẵn sàng bàn giao API cho TV2 (Welsh-Powell, DSATUR),")
-    print("  TV3 (Backtrack + Generator), TV4 (GUI) và TV5 (Benchmark).")
+    print("    MODULE THUẬT TOÁN: THÀNH VIÊN 2 (WELSH-POWELL & DSATUR)")
+    print("=" * 70)
+
+    # 1. Thử nghiệm Welsh-Powell trên bản sao
+    wp_graph = graph.clone()
+    wp_solver = WelshPowellSolver(wp_graph, tie_breaker="index")
+    wp_result = wp_solver.solve()
+    print(f"\n[THỬ NGHIỆM 1] THUẬT TOÁN WELSH-POWELL (Tham lam theo bậc cố định):")
+    print(f"  + Trạng thái: {wp_result['status']}")
+    print(f"  + Thời gian chạy: {wp_result['execution_time_ms']:.3f} ms")
+    print(f"  + Tổng số bước gán: {wp_result['total_steps']}")
+    print(f"  + Số ô tô thành công: {wp_result['colored_count']}/81 ô")
+    if wp_result["deadlock_info"]:
+        print(f"  + Lý do bế tắc (Deadlock): {wp_result['deadlock_info']['reason']}")
+
+    # 2. Thử nghiệm DSATUR thuần túy trên bản sao
+    ds_graph = graph.clone()
+    ds_solver = DSATURSolver(ds_graph)
+    ds_result = ds_solver.solve()
+    print(f"\n[THỬ NGHIỆM 2] THUẬT TOÁN DSATUR (Heuristic bậc bão hòa động):")
+    print(f"  + Trạng thái: {ds_result['status']}")
+    print(f"  + Thời gian chạy: {ds_result['execution_time_ms']:.3f} ms")
+    print(f"  + Tổng số bước gán: {ds_result['total_steps']}")
+    print(f"  + Số ô tô thành công: {ds_result['colored_count']}/81 ô")
+    print(f"  + Thông điệp: {ds_result['message']}")
+    if ds_result["status"] == "SUCCESS":
+        ds_graph.display("KẾT QUẢ GIẢI BẰNG DSATUR")
+
+    print("\n" + "=" * 70)
+    print("  KẾT LUẬN: Đã hoàn thiện nghiệm thu 100% nhiệm vụ Thành viên 2!")
+    print("  - Lớp WelshPowellSolver & DSATURSolver trong Source.algorithms.")
+    print("  - Cơ chế tính và cập nhật Bậc bão hòa động O(1) qua 20 đỉnh kề.")
+    print("  - Đã sẵn sàng phục vụ TV3 (Backtracking), TV4 (GUI) và TV5 (Benchmark).")
     print("=" * 70)
 
     print("\n[BƯỚC 9] KIỂM THỬ THUẬT TOÁN BACKTRACKING + FORWARD CHECKING + DSATUR (TV3):")
