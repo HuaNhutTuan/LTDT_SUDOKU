@@ -18,25 +18,17 @@
 
 ---
 
-## 2. CẤU TRÚC 3 THƯ MỤC NỘP BÀI CHUẨN KHOA CNTT - HCMUE
+## 2. CẤU TRÚC DỰ ÁN VÀ MÃ NGUỒN (SOURCE CODE & RELEASE)
 
 ```text
 LTDT_SUDOKU/
-├── Document/                               # Thư mục Báo cáo & Tài liệu
-│   ├── Bao_Cao_Tieu_Luan_Sudoku_To_Mau_Do_Thi.docx  # Báo cáo chuẩn thể thức HCMUE (A4, TNR 13pt, lề chuẩn)
-│   ├── Bao_Cao_Tieu_Luan_Chinh_Thuc.md      # Toàn văn báo cáo tiểu luận tích hợp đầy đủ 4 chương
-│   ├── Huong_Dan_Su_Dung_GUI.md            # Tài liệu Hướng dẫn sử dụng Giao diện đồ họa (TV4)
-│   ├── Noi_Dung_Bao_Cao_Phan_Mo_Dau_Va_Chuong_2.md  # Bản thảo chi tiết Mở đầu và Chương 2
-│   ├── Noi_Dung_Bao_Cao_Chuong_4_Thuc_Nghiem.md     # Bản thảo chi tiết Chương 4 Thực nghiệm (Thành viên 5)
-│   ├── Slide_Thuyet_Trinh_Thanh_Vien_5.md  # Dàn ý 18 slide, kịch bản thuyết trình và Q&A Thành viên 5
-│   ├── Ke_Hoach_Thuc_Hien_Do_An_Sudoku_To_Mau_Do_Thi.docx # Bản kế hoạch phân công chi tiết 5 thành viên
-│   └── generate_report.py                  # Script sinh tự động file Word báo cáo theo quy chuẩn HCMUE
 ├── Source/                                 # Toàn bộ mã nguồn chương trình
 │   ├── main.py                             # Điểm khởi chạy Console minh họa tổng hợp các giải thuật
 │   ├── benchmark_runner.py                 # Bộ chạy kiểm thử đối sánh 3 giải thuật trên 40 đề (Thành viên 5)
 │   ├── core/                               # Lõi xử lý đồ thị (Graph Core)
 │   │   ├── graph.py                        # Lớp Graph vô hướng tổng quát
 │   │   ├── sudoku_graph.py                 # Lớp SudokuGraph (81 đỉnh, 810 cạnh, 20 đỉnh kề, DSATUR, tiền tô màu)
+│   │   ├── puzzle_generator.py             # Bộ sinh đề Sudoku đối xứng tâm 4 cấp độ có nghiệm duy nhất (TV3)
 │   │   ├── io_handler.py                   # Đọc/ghi đề bài Sudoku (ma trận 9x9, chuỗi 81 ký tự, dataset benchmark)
 │   │   └── benchmark.py                    # Module đo thời gian (ms), đếm bước gán màu, quay lui, 3 giải thuật
 │   ├── algorithms/                         # Các giải thuật tô màu đồ thị (Graph Coloring Algorithms)
@@ -46,15 +38,20 @@ LTDT_SUDOKU/
 │   │   └── backtrack_dsatur.py             # Thuật toán Backtrack kết hợp Forward Checking & DSATUR/MRV (TV3)
 │   ├── gui/                                # Giao diện đồ họa người dùng (Tkinter GUI - TV4)
 │   │   ├── __init__.py                     # Module khởi tạo package GUI
-│   │   └── sudoku_gui.py                   # Lớp SudokuGUI (Canvas 9x9, highlight 20 đỉnh kề, DSATUR step-by-step)
+│   │   └── sudoku_gui.py                   # Lớp SudokuGUI (Canvas 9x9, highlight 20 đỉnh kề, DSATUR step-by-step, sinh đề, lưu đề)
 │   └── tests/                              # Bộ kiểm thử tự động (Unit Tests)
 │       ├── test_sudoku_graph.py            # Test nghiệm thu TV1: 81 đỉnh, 810 cạnh, bậc 20, bắt lỗi tiền tô màu
 │       ├── test_tv2_algorithms.py          # Test nghiệm thu TV2: Welsh-Powell, DSATUR, bậc bão hòa
 │       ├── test_backtrack_dsatur.py        # Test nghiệm thu TV3: Backtrack DSATUR trên 4 cấp độ
+│       ├── test_puzzle_generator.py        # Test nghiệm thu TV3: Bộ sinh đề đối xứng tâm & nghiệm duy nhất
 │       └── test_benchmark.py               # Test nghiệm thu TV5: đo lường thời gian, 3 giải thuật, dataset 40 đề
 ├── Release/                                # Bản đóng gói thực thi & bộ dữ liệu mẫu
+│   ├── web_demo/                           # Sản phẩm Web Demo tương tác đồ thị độc lập (HTML5/CSS3/JS)
+│   │   └── index.html                      # Bàn cờ Sudoku trực quan, Dark/Light mode, WCAG AAA, 40 bản đồ mẫu, tự tạo & lưu đề
 │   ├── puzzles/                            # Các bộ đề kiểm thử chuẩn 4 cấp độ khó
 │   │   ├── benchmark_40.txt                # Tập hợp 40 đề chuẩn phân bổ đều 4 cấp độ (10 Dễ, 10 TB, 10 Khó, 10 Chuyên gia)
+│   │   ├── curated_40_puzzles.json         # Thư viện JSON 40 bản đồ chuẩn hóa 4 cấp độ (10 bản đồ/cấp)
+│   │   ├── saved_custom_puzzles.json       # Tệp lưu trữ các bản đồ tự tạo của người dùng
 │   │   ├── easy_10.txt                     # Bộ 10 đề Dễ (36 clues)
 │   │   ├── medium_10.txt                   # Bộ 10 đề Trung bình (32 clues)
 │   │   ├── hard_10.txt                     # Bộ 10 đề Khó (26 clues)
@@ -67,8 +64,10 @@ LTDT_SUDOKU/
 │   ├── benchmark_summary.json              # File JSON tổng hợp chỉ số hiệu năng
 │   ├── run_console.bat                     # File thực thi chạy Console trên Windows
 │   ├── run_benchmark.bat                   # File thực thi chạy Benchmark 40 đề trên Windows
-│   └── run_gui.bat                         # File thực thi chạy Giao diện GUI trên Windows (TV4)
-└── run_gui.py                              # Script khởi chạy GUI trực tiếp từ thư mục gốc
+│   ├── run_gui.bat                         # File thực thi chạy Giao diện GUI Desktop trên Windows (TV4)
+│   └── run_web_demo.bat                    # File khởi chạy nhanh Web Demo tương tác trên trình duyệt
+├── run_gui.py                              # Script khởi chạy GUI Desktop trực tiếp từ thư mục gốc
+└── run_web_demo.py                         # Script khởi chạy Web Demo trên trình duyệt từ thư mục gốc
 ```
 
 ---
@@ -177,9 +176,14 @@ print(f"Trạng thái: {sol_info['status']} ({sol_info['solutions_count']} nghi�
   ```bash
   python Source/main.py
   ```
-- **Chạy Giao diện đồ họa người dùng (GUI - Thành viên 4):**
+- **Chạy Giao diện đồ họa người dùng Desktop (Tkinter GUI):**
   ```bash
   python run_gui.py
   # Hoặc click đúp file: Release/run_gui.bat
   ```
-- **Trên Windows:** Click đúp vào file `Release/run_console.bat` hoặc `Release/run_gui.bat` để chạy nhanh.
+- **Khởi chạy Sản phẩm Web Demo tương tác trên trình duyệt:**
+  ```bash
+  python run_web_demo.py
+  # Hoặc click đúp file: Release/run_web_demo.bat
+  ```
+- **Trên Windows:** Click đúp vào file `Release/run_gui.bat` hoặc `Release/run_web_demo.bat` để trải nghiệm trực tiếp.

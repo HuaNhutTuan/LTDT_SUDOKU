@@ -6,6 +6,7 @@ Khoa CNTT - Trường ĐH Sư Phạm TP.HCM.
 from .graph import Graph
 from .sudoku_graph import SudokuGraph, PrecoloringConflictError
 from .io_handler import IOHandler
+from .puzzle_generator import PuzzleGenerator
 from .benchmark import (
     BenchmarkMetrics,
     BenchmarkEngine,
@@ -19,6 +20,7 @@ __all__ = [
     "SudokuGraph",
     "PrecoloringConflictError",
     "IOHandler",
+    "PuzzleGenerator",
     "BenchmarkMetrics",
     "BenchmarkEngine",
     "WelshPowellSolver",

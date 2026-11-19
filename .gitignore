@@ -33,4 +33,7 @@ $RECYCLE.BIN/
 *.log
 plan_text.txt
 
-.vs/
+# Documentation & Reports (Excluded from code repository)
+Document/
+*.docx
+

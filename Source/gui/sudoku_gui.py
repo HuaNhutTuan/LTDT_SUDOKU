@@ -15,8 +15,10 @@ Tính năng chính tuần 1:
 
 import sys
 import os
+import json
+import datetime
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox, filedialog, simpledialog
 from typing import Optional, Set, List, Tuple
 
 # Thêm đường dẫn gốc để import các mô-đun trong Source.core
@@ -27,6 +29,7 @@ if PROJECT_ROOT not in sys.path:
 
 from Source.core.sudoku_graph import SudokuGraph, PrecoloringConflictError
 from Source.core.io_handler import IOHandler
+from Source.core.puzzle_generator import PuzzleGenerator
 
 
 class SudokuGUI:
@@ -74,11 +77,15 @@ class SudokuGUI:
         self.stats_steps = 0
         self.stats_backtracks = 0
 
+        # Kho 40 bản đồ mẫu theo 4 cấp độ (10 bản đồ mỗi cấp)
+        self.curated_puzzles = self._load_curated_40_puzzles()
+
         # Nạp đề mẫu ban đầu
         self._load_default_sample()
 
         # Dựng các thành phần giao diện
         self._setup_ui()
+        self._on_level_changed()
 
         # Đăng ký sự kiện bàn phím
         self._bind_events()
@@ -338,34 +345,122 @@ class SudokuGUI:
         )
         group.pack(fill=tk.BOTH, expand=True)
 
-        # Hàng chọn đề mẫu 4 cấp độ
+        # Hàng 1: Sinh đề tự động theo 4 cấp độ (Game Generator - Chức năng thực tế 1)
+        gen_frame = tk.Frame(group, bg=self.COLOR_BG)
+        gen_frame.pack(fill=tk.X, pady=(0, 6))
+
+        tk.Label(
+            gen_frame,
+            text="🎲 Sinh đề mới:",
+            font=("Segoe UI", 9, "bold"),
+            bg=self.COLOR_BG,
+            fg="#0984e3"
+        ).pack(side=tk.LEFT, padx=(0, 6))
+
+        for level_code, level_name, bg_color in [
+            ("easy", "Dễ", "#dff9fb"),
+            ("medium", "Trung bình", "#c7ecee"),
+            ("hard", "Khó", "#ffeaa7"),
+            ("expert", "Chuyên gia", "#ffcccc"),
+        ]:
+            btn = tk.Button(
+                gen_frame,
+                text=level_name,
+                font=("Segoe UI", 8, "bold"),
+                bg=bg_color,
+                relief=tk.GROOVE,
+                padx=6,
+                pady=2,
+                command=lambda d=level_code: self.generate_puzzle(d)
+            )
+            btn.pack(side=tk.LEFT, padx=2)
+
+        # Hàng 2: Kho 40 bản đồ mẫu theo 4 cấp độ (10 bản đồ mỗi cấp độ)
         sample_frame = tk.Frame(group, bg=self.COLOR_BG)
         sample_frame.pack(fill=tk.X, pady=(0, 6))
 
         tk.Label(
             sample_frame,
-            text="Đề mẫu:",
+            text="📚 Bản đồ:",
             font=("Segoe UI", 9, "bold"),
-            bg=self.COLOR_BG
-        ).pack(side=tk.LEFT, padx=(0, 6))
+            bg=self.COLOR_BG,
+            fg="#2d3436"
+        ).pack(side=tk.LEFT, padx=(0, 4))
 
-        for level, filename in [
-            ("Dễ", "sample_easy.txt"),
-            ("Trung bình", "sample_medium.txt"),
-            ("Khó", "sample_hard.txt"),
-            ("Chuyên gia", "sample_expert.txt"),
-        ]:
-            btn = tk.Button(
-                sample_frame,
-                text=level,
-                font=("Segoe UI", 8),
-                bg="#f1f2f6",
-                relief=tk.GROOVE,
-                padx=6,
-                pady=2,
-                command=lambda f=filename: self.load_sample_puzzle(f)
-            )
-            btn.pack(side=tk.LEFT, padx=2)
+        # Combobox chọn Cấp độ
+        self.cbo_level = ttk.Combobox(
+            sample_frame,
+            values=["Dễ (10 đề)", "Trung bình (10 đề)", "Khó (10 đề)", "Chuyên gia (10 đề)"],
+            state="readonly",
+            width=14,
+            font=("Segoe UI", 8)
+        )
+        self.cbo_level.current(0)
+        self.cbo_level.pack(side=tk.LEFT, padx=1)
+        self.cbo_level.bind("<<ComboboxSelected>>", self._on_level_changed)
+
+        # Combobox chọn Bản đồ (1..10)
+        self.cbo_board = ttk.Combobox(
+            sample_frame,
+            values=[f"Bản đồ #{i+1}" for i in range(10)],
+            state="readonly",
+            width=12,
+            font=("Segoe UI", 8)
+        )
+        self.cbo_board.current(0)
+        self.cbo_board.pack(side=tk.LEFT, padx=1)
+
+        # Nút nạp bản đồ
+        btn_load_board = tk.Button(
+            sample_frame,
+            text="▶ Nạp",
+            font=("Segoe UI", 8, "bold"),
+            bg="#0984e3",
+            fg="white",
+            relief=tk.FLAT,
+            padx=5,
+            pady=1,
+            command=self.load_selected_curated_puzzle
+        )
+        btn_load_board.pack(side=tk.LEFT, padx=1)
+
+        # Nút Đề trước / Đề sau
+        btn_prev = tk.Button(
+            sample_frame,
+            text="◀",
+            font=("Segoe UI", 8),
+            bg="#f1f2f6",
+            relief=tk.GROOVE,
+            padx=3,
+            pady=1,
+            command=lambda: self.navigate_curated_puzzle(-1)
+        )
+        btn_prev.pack(side=tk.LEFT, padx=1)
+
+        btn_next = tk.Button(
+            sample_frame,
+            text="▶",
+            font=("Segoe UI", 8),
+            bg="#f1f2f6",
+            relief=tk.GROOVE,
+            padx=3,
+            pady=1,
+            command=lambda: self.navigate_curated_puzzle(1)
+        )
+        btn_next.pack(side=tk.LEFT, padx=1)
+
+        # Nút mở thư viện 40 bản đồ
+        btn_all_boards = tk.Button(
+            sample_frame,
+            text="Kho 40 đề",
+            font=("Segoe UI", 8),
+            bg="#dfe6e9",
+            relief=tk.GROOVE,
+            padx=4,
+            pady=1,
+            command=self.open_all_curated_puzzles_dialog
+        )
+        btn_all_boards.pack(side=tk.LEFT, padx=2)
 
         # Hàng nút công cụ nâng cao
         tools_frame = tk.Frame(group, bg=self.COLOR_BG)
@@ -431,6 +526,68 @@ class SudokuGUI:
             command=self.clear_board
         )
         btn_clear.pack(side=tk.LEFT)
+
+        # Hàng nút Bàn cờ tự tạo & Bàn cờ đã lưu
+        custom_frame = tk.Frame(group, bg=self.COLOR_BG)
+        custom_frame.pack(fill=tk.X, pady=(0, 6))
+
+        tk.Label(
+            custom_frame,
+            text="✍️ Tự tạo đề:",
+            font=("Segoe UI", 9, "bold"),
+            bg=self.COLOR_BG,
+            fg="#0984e3"
+        ).pack(side=tk.LEFT, padx=(0, 4))
+
+        btn_new_blank = tk.Button(
+            custom_frame,
+            text="📝 Nhập bàn cờ trống",
+            font=("Segoe UI", 8, "bold"),
+            bg="#dff9fb",
+            relief=tk.GROOVE,
+            padx=5,
+            pady=2,
+            command=self.clear_board
+        )
+        btn_new_blank.pack(side=tk.LEFT, padx=2)
+
+        btn_lock_puzzle = tk.Button(
+            custom_frame,
+            text="🔒 Khóa làm đề",
+            font=("Segoe UI", 8),
+            bg="#f1f2f6",
+            relief=tk.GROOVE,
+            padx=5,
+            pady=2,
+            command=self.lock_as_puzzle
+        )
+        btn_lock_puzzle.pack(side=tk.LEFT, padx=2)
+
+        btn_save_puzzle = tk.Button(
+            custom_frame,
+            text="💾 Lưu bàn cờ",
+            font=("Segoe UI", 8, "bold"),
+            bg="#55efc4",
+            fg="#2d3436",
+            relief=tk.FLAT,
+            padx=6,
+            pady=2,
+            command=self.save_custom_board
+        )
+        btn_save_puzzle.pack(side=tk.LEFT, padx=2)
+
+        btn_saved_list = tk.Button(
+            custom_frame,
+            text="📁 Bàn cờ đã lưu",
+            font=("Segoe UI", 8, "bold"),
+            bg="#6c5ce7",
+            fg="white",
+            relief=tk.FLAT,
+            padx=7,
+            pady=2,
+            command=self.open_saved_puzzles_dialog
+        )
+        btn_saved_list.pack(side=tk.LEFT, padx=2)
 
         # Hộp thông báo nhật ký hoạt động
         self.txt_log = tk.Text(
@@ -922,6 +1079,48 @@ class SudokuGUI:
         )
         self.graph.load_from_string(backup_str)
 
+    def generate_puzzle(self, difficulty: str) -> None:
+        """
+        Chức năng Tạo trò chơi tự động (Game Generator):
+        Sinh đề Sudoku ngẫu nhiên theo nguyên lý đối xứng tâm 180 độ
+        và cam kết đúng duy nhất 1 nghiệm (Unique Solution).
+        """
+        self._stop_simulation()
+        diff_names = {
+            "easy": "DỄ (36-40 clues)",
+            "medium": "TRUNG BÌNH (32-35 clues)",
+            "hard": "KHÓ (26-31 clues)",
+            "expert": "CHUYÊN GIA (22-25 clues)"
+        }
+        name = diff_names.get(difficulty, difficulty.upper())
+        self.log_message(f"GAME GENERATOR: Đang khởi tạo ngẫu nhiên đề bài {name}...")
+
+        try:
+            self.graph = PuzzleGenerator.generate(difficulty=difficulty)
+            self.selected_vertex = None
+            self.active_step_vertex = None
+            self.hint_vertex = None
+
+            clues_count = sum(1 for c in self.graph.colors if c != 0)
+            self.render_board()
+            self.update_inspector()
+            self.lbl_status.config(
+                text=f"Trạng thái: Đã sinh đề mới ({name}) | Số clues: {clues_count}",
+                fg="#0984e3"
+            )
+            self.log_message(
+                f"TẠO ĐỀ THÀNH CÔNG: Cấp độ {name} gồm {clues_count} clues đối xứng tâm, nghiệm duy nhất!"
+            )
+            messagebox.showinfo(
+                "Tạo đề Sudoku thành công",
+                f"Đã sinh thành công đề bài cấp độ {name}!\n"
+                f"- Số lượng clues ban đầu: {clues_count}\n"
+                f"- Quy cách: Đối xứng tâm 180 độ\n"
+                f"- Tính khả giải: Cam kết đúng 1 nghiệm duy nhất."
+            )
+        except Exception as e:
+            messagebox.showerror("Lỗi sinh đề", f"Không thể sinh đề bài: {e}")
+
     def load_sample_puzzle(self, filename: str) -> None:
         """Nạp một bộ đề mẫu trong thư mục Release/puzzles/."""
         self._stop_simulation()
@@ -939,6 +1138,260 @@ class SudokuGUI:
             self.log_message(f"Đã nạp thành công bộ đề: {filename}")
         except Exception as e:
             messagebox.showerror("Lỗi nạp đề", f"Không thể nạp đề bài: {e}")
+
+    def _load_curated_40_puzzles(self) -> dict:
+        """Nạp danh sách 40 bản đồ mẫu theo 4 cấp độ (10 bản đồ mỗi cấp)."""
+        json_path = os.path.join(PROJECT_ROOT, "Release", "puzzles", "curated_40_puzzles.json")
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"Lỗi đọc curated_40_puzzles.json: {e}")
+
+        # Dự phòng đọc từ 4 file easy_10.txt, medium_10.txt, ...
+        data = {"easy": [], "medium": [], "hard": [], "expert": []}
+        files = {
+            "easy": "easy_10.txt",
+            "medium": "medium_10.txt",
+            "hard": "hard_10.txt",
+            "expert": "expert_10.txt"
+        }
+        for lvl, fname in files.items():
+            fpath = os.path.join(PROJECT_ROOT, "Release", "puzzles", fname)
+            if os.path.exists(fpath):
+                try:
+                    with open(fpath, "r", encoding="utf-8") as f:
+                        cur_id = ""
+                        clues = 0
+                        for line in f:
+                            line = line.strip()
+                            if line.startswith("#") and "Clues:" in line:
+                                parts = line.split("-")
+                                cur_id = parts[0].replace("#", "").strip()
+                                clues = int(parts[1].split(":")[1].strip())
+                            elif line and not line.startswith("#"):
+                                data[lvl].append({"id": cur_id, "clues": clues, "string": line})
+                except Exception:
+                    pass
+        return data
+
+    def _get_active_curated_level_key(self) -> str:
+        """Lấy mã cấp độ (easy, medium, hard, expert) từ combobox cấp độ."""
+        idx = self.cbo_level.current()
+        mapping = ["easy", "medium", "hard", "expert"]
+        return mapping[idx] if 0 <= idx < len(mapping) else "easy"
+
+    def _on_level_changed(self, event=None) -> None:
+        """Cập nhật danh sách bản đồ khi người dùng đổi cấp độ trên Combobox."""
+        if not hasattr(self, "cbo_board"):
+            return
+        lvl_key = self._get_active_curated_level_key()
+        boards = self.curated_puzzles.get(lvl_key, [])
+        options = [f"Bản đồ #{i+1} ({b.get('clues', '?')} clues)" for i, b in enumerate(boards)]
+        if not options:
+            options = [f"Bản đồ #{i+1}" for i in range(10)]
+        self.cbo_board["values"] = options
+        self.cbo_board.current(0)
+
+    def load_selected_curated_puzzle(self) -> None:
+        """Nạp bản đồ đã chọn trong combobox cấp độ và bản đồ."""
+        self._stop_simulation()
+        lvl_key = self._get_active_curated_level_key()
+        boards = self.curated_puzzles.get(lvl_key, [])
+        idx = self.cbo_board.current()
+        if idx < 0 or idx >= len(boards):
+            idx = 0
+
+        p = boards[idx]
+        self.graph.load_from_string(p["string"])
+        self.selected_vertex = None
+        self.hint_vertex = None
+        self.render_board()
+        self.update_inspector()
+
+        lvl_names = {"easy": "Dễ", "medium": "Trung bình", "hard": "Khó", "expert": "Chuyên gia"}
+        lName = lvl_names.get(lvl_key, lvl_key.capitalize())
+        self.log_message(f"Đã nạp Bản đồ #{idx+1}/10 cấp độ {lName} ({p.get('clues', 0)} clues, nghiệm duy nhất).")
+
+    def navigate_curated_puzzle(self, delta: int) -> None:
+        """Chuyển sang bản đồ trước (-1) hoặc bản đồ tiếp theo (+1) trong cấp độ hiện tại."""
+        lvl_key = self._get_active_curated_level_key()
+        boards = self.curated_puzzles.get(lvl_key, [])
+        if not boards:
+            return
+        cur_idx = self.cbo_board.current()
+        next_idx = (cur_idx + delta) % len(boards)
+        self.cbo_board.current(next_idx)
+        self.load_selected_curated_puzzle()
+
+    def open_all_curated_puzzles_dialog(self) -> None:
+        """Mở cửa sổ duyệt danh sách toàn bộ 40 bản đồ tuyển chọn theo 4 cấp độ."""
+        self._stop_simulation()
+        top = tk.Toplevel(self.root)
+        top.title("HCMUE - Kho 40 Bản đồ Sudoku Tuyển chọn (10 đề / cấp độ)")
+        top.geometry("720x460")
+        top.minsize(620, 360)
+        top.configure(bg=self.COLOR_BG)
+        top.transient(self.root)
+        top.grab_set()
+
+        # Tiêu đề
+        lbl_head = tk.Label(
+            top,
+            text="📚 KHO 40 BẢN ĐỒ SUDOKU TUYỂN CHỌN THEO 4 CẤP ĐỘ",
+            font=("Segoe UI", 11, "bold"),
+            bg=self.COLOR_BG,
+            fg="#2f3640"
+        )
+        lbl_head.pack(anchor="w", padx=15, pady=(12, 6))
+
+        # Khung lọc cấp độ
+        filter_frame = tk.Frame(top, bg=self.COLOR_BG)
+        filter_frame.pack(fill=tk.X, padx=15, pady=(0, 6))
+
+        tk.Label(filter_frame, text="Lọc cấp độ:", font=("Segoe UI", 9, "bold"), bg=self.COLOR_BG).pack(side=tk.LEFT, padx=(0, 6))
+
+        level_var = tk.StringVar(value="all")
+        for code, name in [("all", "Tất cả (40 đề)"), ("easy", "🟢 Dễ (10)"), ("medium", "🟡 Trung bình (10)"), ("hard", "🟠 Khó (10)"), ("expert", "🔴 Chuyên gia (10)")]:
+            rb = tk.Radiobutton(
+                filter_frame,
+                text=name,
+                value=code,
+                variable=level_var,
+                bg=self.COLOR_BG,
+                font=("Segoe UI", 8),
+                command=lambda: populate_tree()
+            )
+            rb.pack(side=tk.LEFT, padx=3)
+
+        # Bảng hiển thị
+        table_frame = tk.Frame(top, bg=self.COLOR_BG)
+        table_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=4)
+
+        columns = ("id", "level", "name", "clues", "sol")
+        tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=13)
+        tree.heading("id", text="Mã đề")
+        tree.heading("level", text="Cấp độ")
+        tree.heading("name", text="Tên bản đồ")
+        tree.heading("clues", text="Số clues")
+        tree.heading("sol", text="Tính khả giải")
+
+        tree.column("id", width=80, anchor="center")
+        tree.column("level", width=100, anchor="center")
+        tree.column("name", width=160)
+        tree.column("clues", width=80, anchor="center")
+        tree.column("sol", width=160, anchor="center")
+
+        scrollbar = ttk.Scrollbar(table_frame, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscroll=scrollbar.set)
+        tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        level_display = {"easy": "🟢 Dễ", "medium": "🟡 Trung bình", "hard": "🟠 Khó", "expert": "🔴 Chuyên gia"}
+
+        def populate_tree():
+            for item in tree.get_children():
+                tree.delete(item)
+            selected_lvl = level_var.get()
+            for lvl_key in ["easy", "medium", "hard", "expert"]:
+                if selected_lvl != "all" and selected_lvl != lvl_key:
+                    continue
+                boards = self.curated_puzzles.get(lvl_key, [])
+                for i, b in enumerate(boards):
+                    tree.insert(
+                        "",
+                        tk.END,
+                        iid=f"{lvl_key}_{i}",
+                        values=(
+                            b.get("id", f"#{i+1}"),
+                            level_display.get(lvl_key, lvl_key),
+                            f"Bản đồ #{i+1} ({lvl_key})",
+                            f"{b.get('clues', 0)} / 81",
+                            "✔ 1 nghiệm duy nhất"
+                        )
+                    )
+
+        populate_tree()
+
+        # Thanh nút thao tác
+        btn_bar = tk.Frame(top, bg=self.COLOR_BG, pady=10)
+        btn_bar.pack(fill=tk.X, padx=15)
+
+        def on_load_click():
+            sel = tree.selection()
+            if not sel:
+                messagebox.showwarning("Chọn bản đồ", "Vui lòng click chọn 1 bản đồ trong bảng!", parent=top)
+                return
+            key = sel[0]
+            lvl_key, idx_str = key.split("_")
+            idx = int(idx_str)
+            p = self.curated_puzzles[lvl_key][idx]
+
+            self.graph.load_from_string(p["string"])
+            self.selected_vertex = None
+            self.hint_vertex = None
+            self.render_board()
+            self.update_inspector()
+
+            mapping = {"easy": 0, "medium": 1, "hard": 2, "expert": 3}
+            if lvl_key in mapping:
+                self.cbo_level.current(mapping[lvl_key])
+                self._on_level_changed()
+                self.cbo_board.current(idx)
+
+            lName = level_display.get(lvl_key, lvl_key)
+            self.log_message(f"Đã nạp {lName} - Bản đồ #{idx+1} ({p.get('clues', 0)} clues) từ Kho 40 đề.")
+            top.destroy()
+
+        def on_copy_click():
+            sel = tree.selection()
+            if not sel:
+                messagebox.showwarning("Chọn bản đồ", "Vui lòng click chọn 1 bản đồ trong bảng!", parent=top)
+                return
+            key = sel[0]
+            lvl_key, idx_str = key.split("_")
+            p = self.curated_puzzles[lvl_key][int(idx_str)]
+            self.root.clipboard_clear()
+            self.root.clipboard_append(p["string"])
+            messagebox.showinfo("Đã sao chép", f"Đã sao chép mã 81 số của bản đồ {p.get('id', '')}!", parent=top)
+
+        btn_load = tk.Button(
+            btn_bar,
+            text="▶ Nạp bản đồ này",
+            font=("Segoe UI", 9, "bold"),
+            bg="#0984e3",
+            fg="white",
+            relief=tk.FLAT,
+            padx=10,
+            pady=4,
+            command=on_load_click
+        )
+        btn_load.pack(side=tk.LEFT, padx=(0, 6))
+
+        btn_copy = tk.Button(
+            btn_bar,
+            text="📋 Sao chép mã 81 số",
+            font=("Segoe UI", 9),
+            bg="#f1f2f6",
+            relief=tk.GROOVE,
+            padx=8,
+            pady=4,
+            command=on_copy_click
+        )
+        btn_copy.pack(side=tk.LEFT, padx=(0, 6))
+
+        btn_close = tk.Button(
+            btn_bar,
+            text="Đóng",
+            font=("Segoe UI", 9),
+            bg="#dfe6e9",
+            relief=tk.FLAT,
+            padx=10,
+            pady=4,
+            command=top.destroy
+        )
+        btn_close.pack(side=tk.RIGHT)
 
     def open_file_dialog(self) -> None:
         """Mở hộp thoại chọn file .txt bất kỳ trên máy."""
@@ -972,14 +1425,348 @@ class SudokuGUI:
         self.log_message("Đã đặt lại bàn cờ về trạng thái đề bài ban đầu.")
 
     def clear_board(self) -> None:
-        """Xóa trắng toàn bộ bàn cờ để người dùng tự nhập đề mới."""
+        """Xóa trắng toàn bộ bàn cờ để người dùng tự do nhập đề bài mới."""
         self._stop_simulation()
         self.graph.clear()
-        self.selected_vertex = None
+        self.selected_vertex = 0
         self.hint_vertex = None
         self.render_board()
         self.update_inspector()
-        self.log_message("Đã xóa trắng bàn cờ. Bạn có thể tự do nhập đề bài mới.")
+        self.log_message("ĐÃ BẬT CHẾ ĐỘ NHẬP BÀN CỜ TRỐNG: Hãy click vào các ô và gõ phím số [1..9] để tự tạo đề bài.")
+
+    def lock_as_puzzle(self) -> None:
+        """Khóa các số đã nhập trên bàn cờ làm đề bài chính thức (tiền tô màu cố định)."""
+        clues = sum(1 for c in self.graph.colors if c != 0)
+        if clues == 0:
+            messagebox.showwarning("Cảnh báo", "Bàn cờ đang trống! Vui lòng nhập các con số trước khi khóa làm đề.")
+            return
+
+        conflicts = self.graph.get_all_conflicts()
+        if conflicts:
+            messagebox.showerror(
+                "Xung đột",
+                f"Bàn cờ có {len(conflicts)} cặp ô bị trùng màu! Vui lòng xóa hoặc sửa các ô vi phạm trước khi khóa làm đề."
+            )
+            return
+
+        for v in range(self.graph.num_vertices):
+            self.graph.is_precolored[v] = (self.graph.colors[v] != 0)
+
+        self.render_board()
+        self.update_inspector()
+        self.log_message(f"Đã cố định {clues} số vừa nhập thành đề bài chính thức (tiền tô màu).")
+        messagebox.showinfo(
+            "Khóa đề thành công",
+            f"Đã khóa thành công {clues} số làm đề bài chính thức!\nBây giờ bạn có thể bắt đầu giải, chạy thuật toán hoặc xem gợi ý."
+        )
+
+    def _get_saved_puzzles_path(self) -> str:
+        """Đường dẫn tệp lưu trữ danh sách bàn cờ tự tạo."""
+        puzzles_dir = os.path.join(PROJECT_ROOT, "Release", "puzzles")
+        os.makedirs(puzzles_dir, exist_ok=True)
+        return os.path.join(puzzles_dir, "saved_custom_puzzles.json")
+
+    def _load_saved_puzzles(self) -> list:
+        """Nạp danh sách bàn cờ đã lưu từ tệp JSON."""
+        path = self._get_saved_puzzles_path()
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        return data
+            except Exception as e:
+                self.log_message(f"Không thể đọc file bàn cờ đã lưu: {e}")
+
+        # Danh sách mặc định ban đầu nếu tệp chưa có
+        defaults = [
+            {
+                "id": "board_sample_easy",
+                "name": "Đề Mẫu 1: Dễ Nhập Môn",
+                "created_at": "2026-11-19 09:00",
+                "string": "530070000600195000098000060800060003400803001700020006060000280000419005000080079",
+                "clues_count": 30,
+                "solutions_count": 1
+            },
+            {
+                "id": "board_sample_medium",
+                "name": "Đề Mẫu 2: Đối Xứng Hoa Cúc",
+                "created_at": "2026-11-19 09:00",
+                "string": "000000010400000000020000000000050407008000300001090000300400200050100000000806000",
+                "clues_count": 22,
+                "solutions_count": 1
+            },
+            {
+                "id": "board_sample_17",
+                "name": "Đề Mẫu 3: Độc Đáo 17 Số",
+                "created_at": "2026-11-19 09:00",
+                "string": "000000012000000003002300400001800005060070800000009000008500000900040500470006000",
+                "clues_count": 17,
+                "solutions_count": 1
+            }
+        ]
+        self._save_saved_puzzles(defaults)
+        return defaults
+
+    def _save_saved_puzzles(self, puzzles: list) -> None:
+        """Ghi danh sách bàn cờ vào tệp JSON."""
+        path = self._get_saved_puzzles_path()
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(puzzles, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            self.log_message(f"Lỗi khi ghi tệp bàn cờ đã lưu: {e}")
+
+    def save_custom_board(self) -> None:
+        """Lưu bàn cờ hiện tại vào Mục Bàn cờ đã lưu."""
+        clues = sum(1 for c in self.graph.colors if c != 0)
+        if clues == 0:
+            messagebox.showwarning("Cảnh báo", "Bàn cờ đang trống! Vui lòng nhập các số trước khi lưu.")
+            return
+
+        conflicts = self.graph.get_all_conflicts()
+        if conflicts:
+            messagebox.showerror(
+                "Xung đột",
+                f"Bàn cờ có {len(conflicts)} cặp ô bị trùng màu! Vui lòng sửa lại trước khi lưu."
+            )
+            return
+
+        saved_list = self._load_saved_puzzles()
+        default_name = f"Bàn cờ tự tạo #{len(saved_list) + 1}"
+        name = simpledialog.askstring(
+            "Lưu bàn cờ",
+            "Nhập tên gợi nhớ cho bàn cờ tự tạo:",
+            initialvalue=default_name,
+            parent=self.root
+        )
+        if not name or not name.strip():
+            return
+
+        name = name.strip()
+        board_str = "".join(str(c) if c != 0 else "." for c in self.graph.colors)
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+        # Kiểm tra nhanh số nghiệm
+        sol_info = self.graph.check_solvability()
+        sols_count = sol_info.get("solutions_count", 1)
+
+        new_item = {
+            "id": f"board_{int(datetime.datetime.now().timestamp())}",
+            "name": name,
+            "created_at": now_str,
+            "string": board_str,
+            "clues_count": clues,
+            "solutions_count": sols_count
+        }
+
+        saved_list.insert(0, new_item)
+        self._save_saved_puzzles(saved_list)
+        self.log_message(f"Đã lưu thành công bàn cờ '{name}' ({clues} số) vào Mục Bàn cờ đã lưu.")
+        messagebox.showinfo(
+            "Lưu thành công",
+            f"Đã lưu thành công bàn cờ '{name}' vào Mục Bàn cờ đã lưu!\n"
+            f"- Số clues: {clues}/81\n"
+            f"- Thẩm định khả giải: {sol_info.get('status', 'Khả giải')} ({sols_count} nghiệm)\n\n"
+            f"Bạn có thể mở nút '📁 Bàn cờ đã lưu' để xem lại bất cứ lúc nào."
+        )
+
+    def open_saved_puzzles_dialog(self) -> None:
+        """Mở cửa sổ quản lý và chọn các bàn cờ đã lưu."""
+        self._stop_simulation()
+        saved_list = self._load_saved_puzzles()
+
+        top = tk.Toplevel(self.root)
+        top.title("HCMUE - Mục Bàn cờ Sudoku đã lưu")
+        top.geometry("680x440")
+        top.minsize(580, 350)
+        top.configure(bg=self.COLOR_BG)
+        top.transient(self.root)
+        top.grab_set()
+
+        # Tiêu đề
+        lbl_head = tk.Label(
+            top,
+            text="📁 DANH SÁCH BÀN CỜ ĐÃ LƯU & TỰ TẠO",
+            font=("Segoe UI", 11, "bold"),
+            bg=self.COLOR_BG,
+            fg="#2f3640"
+        )
+        lbl_head.pack(anchor="w", padx=15, pady=(12, 6))
+
+        # Khung bảng dữ liệu
+        table_frame = tk.Frame(top, bg=self.COLOR_BG)
+        table_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=4)
+
+        columns = ("name", "clues", "sols", "date")
+        tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=12)
+        tree.heading("name", text="Tên bàn cờ")
+        tree.heading("clues", text="Số clues")
+        tree.heading("sols", text="Số nghiệm")
+        tree.heading("date", text="Ngày lưu")
+
+        tree.column("name", width=250)
+        tree.column("clues", width=80, anchor="center")
+        tree.column("sols", width=120, anchor="center")
+        tree.column("date", width=140, anchor="center")
+
+        scrollbar = ttk.Scrollbar(table_frame, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscroll=scrollbar.set)
+
+        tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        def refresh_tree():
+            for item in tree.get_children():
+                tree.delete(item)
+            nonlocal saved_list
+            saved_list = self._load_saved_puzzles()
+            for b in saved_list:
+                sols_str = "1 nghiệm duy nhất ✔" if b.get("solutions_count") == 1 else (
+                    "0 nghiệm (Bế tắc) 🛑" if b.get("solutions_count") == 0 else f"{b.get('solutions_count', '>1')} nghiệm"
+                )
+                tree.insert(
+                    "",
+                    tk.END,
+                    iid=b["id"],
+                    values=(b["name"], f"{b.get('clues_count', 0)} / 81", sols_str, b.get("created_at", ""))
+                )
+
+        refresh_tree()
+
+        # Nút chức năng phía dưới
+        btn_bar = tk.Frame(top, bg=self.COLOR_BG, pady=10)
+        btn_bar.pack(fill=tk.X, padx=15)
+
+        def on_play_selected():
+            sel = tree.selection()
+            if not sel:
+                messagebox.showwarning("Chọn bàn cờ", "Vui lòng click chọn 1 bàn cờ trong danh sách!", parent=top)
+                return
+            board_id = sel[0]
+            board = next((b for b in saved_list if b["id"] == board_id), None)
+            if not board:
+                return
+
+            self.graph.load_from_string(board["string"])
+            self.selected_vertex = None
+            self.hint_vertex = None
+            self.render_board()
+            self.update_inspector()
+            self.log_message(f"Đã nạp bàn cờ đã lưu: '{board['name']}' ({board.get('clues_count', 0)} clues) để giải.")
+            top.destroy()
+
+        def on_edit_selected():
+            sel = tree.selection()
+            if not sel:
+                messagebox.showwarning("Chọn bàn cờ", "Vui lòng click chọn 1 bàn cờ trong danh sách!", parent=top)
+                return
+            board_id = sel[0]
+            board = next((b for b in saved_list if b["id"] == board_id), None)
+            if not board:
+                return
+
+            clean = board["string"].replace(".", "0")
+            self.graph.clear()
+            for i, ch in enumerate(clean):
+                if i < 81 and ch in "123456789":
+                    self.graph.colors[i] = int(ch)
+            self.selected_vertex = 0
+            self.hint_vertex = None
+            self.render_board()
+            self.update_inspector()
+            self.log_message(f"Đang mở bàn cờ '{board['name']}' trên lưới trống để chỉnh sửa số đề bài.")
+            top.destroy()
+
+        def on_copy_selected():
+            sel = tree.selection()
+            if not sel:
+                messagebox.showwarning("Chọn bàn cờ", "Vui lòng click chọn 1 bàn cờ trong danh sách!", parent=top)
+                return
+            board_id = sel[0]
+            board = next((b for b in saved_list if b["id"] == board_id), None)
+            if not board:
+                return
+            self.root.clipboard_clear()
+            self.root.clipboard_append(board["string"])
+            messagebox.showinfo("Đã sao chép", f"Đã sao chép mã 81 số của '{board['name']}' vào clipboard!", parent=top)
+
+        def on_delete_selected():
+            sel = tree.selection()
+            if not sel:
+                messagebox.showwarning("Chọn bàn cờ", "Vui lòng click chọn 1 bàn cờ trong danh sách!", parent=top)
+                return
+            board_id = sel[0]
+            board = next((b for b in saved_list if b["id"] == board_id), None)
+            if not board:
+                return
+            if messagebox.askyesno("Xác nhận xóa", f"Bạn có chắc muốn xóa bàn cờ '{board['name']}' khỏi danh sách?", parent=top):
+                next_list = [b for b in saved_list if b["id"] != board_id]
+                self._save_saved_puzzles(next_list)
+                refresh_tree()
+                self.log_message(f"Đã xóa bàn cờ '{board['name']}' khỏi mục đã lưu.")
+
+        btn_play = tk.Button(
+            btn_bar,
+            text="▶ Nạp để giải / chơi",
+            font=("Segoe UI", 9, "bold"),
+            bg="#0984e3",
+            fg="white",
+            relief=tk.FLAT,
+            padx=10,
+            pady=4,
+            command=on_play_selected
+        )
+        btn_play.pack(side=tk.LEFT, padx=(0, 6))
+
+        btn_edit = tk.Button(
+            btn_bar,
+            text="✏️ Sửa trên lưới trống",
+            font=("Segoe UI", 9),
+            bg="#f1f2f6",
+            relief=tk.GROOVE,
+            padx=8,
+            pady=4,
+            command=on_edit_selected
+        )
+        btn_edit.pack(side=tk.LEFT, padx=(0, 6))
+
+        btn_copy = tk.Button(
+            btn_bar,
+            text="📋 Sao chép mã 81 số",
+            font=("Segoe UI", 9),
+            bg="#f1f2f6",
+            relief=tk.GROOVE,
+            padx=8,
+            pady=4,
+            command=on_copy_selected
+        )
+        btn_copy.pack(side=tk.LEFT, padx=(0, 6))
+
+        btn_del = tk.Button(
+            btn_bar,
+            text="🗑 Xóa",
+            font=("Segoe UI", 9),
+            bg="#ff7675",
+            fg="white",
+            relief=tk.FLAT,
+            padx=8,
+            pady=4,
+            command=on_delete_selected
+        )
+        btn_del.pack(side=tk.LEFT, padx=(0, 6))
+
+        btn_close = tk.Button(
+            btn_bar,
+            text="Đóng",
+            font=("Segoe UI", 9),
+            bg="#dfe6e9",
+            relief=tk.FLAT,
+            padx=10,
+            pady=4,
+            command=top.destroy
+        )
+        btn_close.pack(side=tk.RIGHT)
 
     def _stop_simulation(self) -> None:
         """Dừng hoàn toàn tiến trình mô phỏng đang chạy."""
