@@ -1104,7 +1104,7 @@ class SudokuGUI:
             clues_count = sum(1 for c in self.graph.colors if c != 0)
             self.render_board()
             self.update_inspector()
-            self.lbl_status.config(
+            self.lbl_status_info.config(
                 text=f"Trạng thái: Đã sinh đề mới ({name}) | Số clues: {clues_count}",
                 fg="#0984e3"
             )
